@@ -141,7 +141,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ARMDDisplay.c" />
+    <ClCompile Include="ARMDDisplyStrings.c" />
+    <ClCompile Include="ARMDFileReader.c" />
+    <ClCompile Include="ARMDHeaderDisplay.c" />
+    <ClCompile Include="ARMDHeaderParser.c" />
+    <ClCompile Include="ARMDInfReader.c" />
+    <ClCompile Include="ARMDMessageParser.c" />
+    <ClCompile Include="ARMDParser.c" />
+    <ClCompile Include="ARMDParserData.c" />
+    <ClCompile Include="ARMDProcessedData.c" />
     <ClCompile Include="ARMDText.c" />
+    <ClCompile Include="Keyboard.c" />
+    <ClCompile Include="ProgrammParameters.c" />
+    <ClCompile Include="StringsEn.c" />
+    <ClCompile Include="StringsRu.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ARMD.h" />
+    <ClInclude Include="ARMDDisplay.h" />
+    <ClInclude Include="ARMDDisplayStrings.h" />
+    <ClInclude Include="ARMDError.h" />
+    <ClInclude Include="ARMDFileReader.h" />
+    <ClInclude Include="ARMDHeaderDisplay.h" />
+    <ClInclude Include="ARMDHeaderParser.h" />
+    <ClInclude Include="ARMDInfReader.h" />
+    <ClInclude Include="ARMDMessage.h" />
+    <ClInclude Include="ARMDMessageParser.h" />
+    <ClInclude Include="ARMDParser.h" />
+    <ClInclude Include="ARMDParserData.h" />
+    <ClInclude Include="ARMDProcessData.h" />
+    <ClInclude Include="ARMDText.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="ProgrammParameters.h" />
+    <ClInclude Include="StringsEn.h" />
+    <ClInclude Include="StringsRu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
