@@ -12,13 +12,21 @@ int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARM
         BOOL ensure_capacity_result = EnsureCapacityOfProcessedData(armd_processed_data);
         if (ensure_capacity_result == ERROR_OK)
         {
+            DWORD index = armd_parser_data->index;
+            ARMDMessageData* armd_data = armd_processed_data->data[armd_processed_data->number_items];
             //считываем начальные параметры переменных, если вызов идет сразу после считывания заголовка
-            if ((res = ParseARMDMessage(*armd_header_info, armd_processed_data, armd_parser_data, no_event_state)) >= 0)
+            if ((res = ParseARMDMessage(armd_data, *armd_header_info,armd_parser_data, no_event_state)) >= 0)
             {
+                if (armd_data->check == CheckMessageData(armd_parser_data->buf, index, armd_parser_data->index - 1))
+                    armd_processed_data->number_items++;
+                else
+                {
+                    _tprintf(_T("%s. %s."), GetARMDString(I_DATA_CHECK_ERROR), GetARMDString(I_DATA_IS_CORRUPTED));
+                    parse_armd_buffer_status = ERROR_WRONG_CHECK;
+                }
             }
             else
                 parse_armd_buffer_status = res;
-            armd_processed_data->number_items++;
         }
         else
             parse_armd_buffer_status = ensure_capacity_result;
