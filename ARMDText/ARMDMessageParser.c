@@ -33,15 +33,20 @@ int ParseARMDMessage(ARMDHeaderInfo* armd_header_info, ARMDProcessedData* armd_p
     GetValFromBuf(&armd_data->events_len, armd_parser_data, sizeof(WORD)); //длина всех событий
     if (armd_parser_data->index + armd_data->events_len >= armd_parser_data->max_buf)
         return ERROR_OUT_OF_RANGE;
-
-    GetValFromBuf(&armd_data->num_proc, armd_parser_data, sizeof(BYTE));//количество всех процессов
-    armd_data->proc_data = (ARMDProcessData*)calloc(armd_data->num_proc, sizeof(ARMDProcessData));
-    for (short i_proc = 0; i_proc < armd_data->num_proc; i_proc++) //перебираем процессы
+    
+    BYTE number_of_processes;
+    GetValFromBuf(&number_of_processes, armd_parser_data, sizeof(BYTE));//количество всех процессов
+    armd_data->proc_data = (ARMDProcessData*)calloc(number_of_processes, sizeof(ARMDProcessData));
+    short i_proc;
+    for (i_proc = 0; i_proc < number_of_processes; i_proc++) //перебираем процессы
     {
+        short number_of_events;
+        short i_event;
+
         GetValFromBuf(&armd_data->proc_data[i_proc].proc, armd_parser_data, sizeof(BYTE)); //текущий процесс
-        GetValFromBuf(&armd_data->proc_data[i_proc].num_event, armd_parser_data, sizeof(short)); //количесво событий
-        armd_data->proc_data[i_proc].event_data = (ARMDEventData*)calloc(armd_data->proc_data[i_proc].num_event, sizeof(ARMDEventData));
-        for (short i_event = 0; i_event < armd_data->proc_data[i_proc].num_event; i_event++) //перебираем события
+        GetValFromBuf(&number_of_events, armd_parser_data, sizeof(short)); //количесво событий
+        armd_data->proc_data[i_proc].event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
+        for (i_event = 0; i_event < number_of_events; i_event++) //перебираем события
         {
             GetValFromBuf(&armd_inf_pos, armd_parser_data, sizeof(short)); //получаем индекс события в заголовке
             ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[i_event];
@@ -212,7 +217,10 @@ int ParseARMDMessage(ARMDHeaderInfo* armd_header_info, ARMDProcessedData* armd_p
                 break;
             }
         }
+        armd_data->proc_data[i_proc].num_event = i_event;
     }
+    armd_data->num_proc = (BYTE)i_proc;
+
     BYTE check = 0;
     for (DWORD ch = index; ch < armd_parser_data->index; ch++)
     {
