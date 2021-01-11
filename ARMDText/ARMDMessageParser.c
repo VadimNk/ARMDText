@@ -6,12 +6,78 @@
 #include "ARMDMessageParser.h"
 #include "ARMDDisplayStrings.h"
 
+void FreeCharacterizationFileData(CharacterizationFileData* file_data, BYTE character_files_num);
+
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
 {
 	BYTE check = 0;
 	for (DWORD ch = start_index; ch < finish_index; ch++)
 		check ^= buffer[ch];
 	return check;
+}
+
+int ParceEventSystemStart(SystemStartData* system_start_data, ARMDParserData* armd_parser_data)
+{
+	int parce_events_system_start_status = ERROR_OK;
+	system_start_data = (SystemStartData*)calloc(1, sizeof(SystemStartData));
+	if (system_start_data)
+	{
+		GetValFromBuf(&system_start_data->Year, armd_parser_data, sizeof(WORD));
+		GetValFromBuf(&system_start_data->Month, armd_parser_data, sizeof(WORD));
+		GetValFromBuf(&system_start_data->Day, armd_parser_data, sizeof(WORD));
+		GetValFromBuf(&system_start_data->time, armd_parser_data, sizeof(DWORD));
+		//-----------------------------информация о файлах характеризации-----------------------------------------------------------//
+		BYTE character_files_num;
+		GetValFromBuf(&character_files_num, armd_parser_data, sizeof(BYTE));
+		if (character_files_num > 0)
+		{
+			system_start_data->file_data = (CharacterizationFileData*)calloc(character_files_num, sizeof(CharacterizationFileData));
+			if (system_start_data->file_data)
+			{
+				int i;
+				for (i = 0; i < character_files_num; i++)
+				{
+					BYTE len;
+					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
+					system_start_data->file_data[i].logical_name = (char*)calloc((size_t)len + 1, sizeof(char));
+					if(system_start_data->file_data[i].logical_name)
+						GetValFromBuf(system_start_data->file_data[i].logical_name, armd_parser_data, len);
+					else
+					{
+						parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
+						break;
+					}
+					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
+					system_start_data->file_data[i].physical_name = (char*)calloc((size_t)len + 1, sizeof(char));
+					if(system_start_data->file_data[i].physical_name)
+						GetValFromBuf(system_start_data->file_data[i].physical_name, armd_parser_data, len);
+					else
+					{
+						parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
+						break;
+					}
+
+					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
+					system_start_data->file_data[i].destination = (char*)calloc((size_t)len + 1, sizeof(char));
+					if(system_start_data->file_data[i].destination)
+						GetValFromBuf(system_start_data->file_data[i].destination, armd_parser_data, len);
+					else
+					{
+						parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
+						break;
+					}
+				}
+				if (parce_events_system_start_status < ERROR_OK)
+					FreeCharacterizationFileData(system_start_data->file_data, i);
+			}
+			else
+				parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
+		}
+		system_start_data->character_files_num = character_files_num;
+		//--------------------------------------------------------------------------------------------------------------------------//
+	}
+	else
+		parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
 }
 
 int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
@@ -223,7 +289,7 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 			armd_data->proc_data = (ARMDProcessData*)calloc(number_of_processes, sizeof(ARMDProcessData));
 			if (armd_data->proc_data)
 			{
-				ParceEventsByProcess(armd_data, armd_header_info, armd_parser_data, no_event_state, number_of_processes);
+				ParceEventsByProcesses(armd_data, armd_header_info, armd_parser_data, no_event_state, number_of_processes);
 
 				GetValFromBuf(&armd_data->check, armd_parser_data, sizeof(BYTE));
 			}
@@ -236,6 +302,17 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 	else
 		return ERROR_OUT_OF_RANGE;
 	return 0;
+}
+
+void FreeCharacterizationFileData(CharacterizationFileData * file_data, BYTE character_files_num)
+{
+	for (int i = 0; i < character_files_num; i++)
+	{
+		free((file_data + i)->logical_name);
+		free((file_data + i)->physical_name);
+		free((file_data + i)->destination);
+	}
+	free(file_data);
 }
 
 int FreeEventData(ARMDMessageData* armd_data)
