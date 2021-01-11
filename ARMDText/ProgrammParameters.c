@@ -61,7 +61,7 @@ ProgrammParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 							if (programm_parameters.specified_armd_file)
 								_tcscpy_s(programm_parameters.specified_armd_file, str_len + 1, tmp_str);
 							else
-								programm_parameters.status = ERROR_OUT_OF_MEMORY;
+								programm_parameters.status = ERROR_MEMORY_ALLOCATION_ERROR;
 						}
 					}
 				}

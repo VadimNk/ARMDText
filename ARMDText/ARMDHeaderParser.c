@@ -77,16 +77,16 @@ int LoadHeader(ARMDHeaderInfo** const armd_header_info_p, ARMDParserData* armd_p
                 }
                 else
                 {
-                    load_header_result = ERROR_OUT_OF_MEMORY;
+                    load_header_result = ERROR_MEMORY_ALLOCATION_ERROR;
                     break;
                 }
             }
         }
         else
-            load_header_result = ERROR_OUT_OF_MEMORY;
+            load_header_result = ERROR_MEMORY_ALLOCATION_ERROR;
     }
     else
-        load_header_result = ERROR_OUT_OF_MEMORY;
+        load_header_result = ERROR_MEMORY_ALLOCATION_ERROR;
     if (load_header_result < 0)
     {
         FreeHeader(&armd_header_info);

@@ -42,7 +42,7 @@ int EnsureCapacityOfProcessedData(ARMDProcessedData* armd_processed_data)
                     {
                         for (DWORD d_j = armd_processed_data->max_items; d_j < d_i; d_j++)
                             free(armd_processed_data->data[d_i]);
-                        ensure_capacity_status = ERROR_OUT_OF_MEMORY;
+                        ensure_capacity_status = ERROR_MEMORY_ALLOCATION_ERROR;
                         break;
                     }
                 }
@@ -52,7 +52,7 @@ int EnsureCapacityOfProcessedData(ARMDProcessedData* armd_processed_data)
             else
             {
                 _tprintf(_T("%s!"), GetARMDString(I_MEMORY_ALLOCATION_ERROR));
-                ensure_capacity_status = ERROR_OUT_OF_MEMORY;
+                ensure_capacity_status = ERROR_MEMORY_ALLOCATION_ERROR;
             }
         }
     }

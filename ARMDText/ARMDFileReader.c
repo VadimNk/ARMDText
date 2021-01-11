@@ -52,7 +52,7 @@ int ReadARMDFile(DWORD current_file_name_max_characters, _TCHAR* current_file_na
             }
             else
             {//не смогли выделить буфер
-                ReadARMDFileResult = ERROR_OUT_OF_MEMORY;
+                ReadARMDFileResult = ERROR_MEMORY_ALLOCATION_ERROR;
             }
         }
         else
