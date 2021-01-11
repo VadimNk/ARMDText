@@ -155,6 +155,7 @@
     <ClCompile Include="ARMDProcessedData.c" />
     <ClCompile Include="ARMDText.c" />
     <ClCompile Include="Keyboard.c" />
+    <ClCompile Include="Misc.c" />
     <ClCompile Include="ProgrammParameters.c" />
     <ClCompile Include="StringsEn.c" />
     <ClCompile Include="StringsRu.c" />
@@ -175,6 +176,7 @@
     <ClInclude Include="ARMDProcessData.h" />
     <ClInclude Include="ARMDText.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Misc.h" />
     <ClInclude Include="ProgrammParameters.h" />
     <ClInclude Include="StringsEn.h" />
     <ClInclude Include="StringsRu.h" />
