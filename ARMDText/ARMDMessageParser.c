@@ -18,68 +18,73 @@ BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const 
 	return check;
 }
 
-int ParceEventSystemStart(SystemStartData* system_start_data, ARMDParserData* armd_parser_data)
+//-----------------------------информация о файлах характеризации-----------------------------------------------------------//
+int GetCharacterizationFiles(BYTE * const character_files_num_out, CharacterizationFileData** const file_data_out, ARMDParserData* const armd_parser_data)
+{
+	int i;
+	int status = ERROR_OK;
+	BYTE character_files_num;
+	CharacterizationFileData* file_data = NULL;
+	GetValFromBuf(&character_files_num, armd_parser_data, sizeof(BYTE));
+	if (character_files_num > 0)
+	{
+		file_data = (CharacterizationFileData*)calloc(character_files_num, sizeof(CharacterizationFileData));
+		if (file_data)
+		{
+			for (i = 0; i < character_files_num; i++)
+			{
+				status = ParceString(&file_data[i].logical_name, armd_parser_data);
+				if (status < ERROR_OK)
+					break;
+
+				status = ParceString(&file_data[i].physical_name, armd_parser_data);
+				if (status < ERROR_OK)
+					break;
+
+				status = ParceString(&file_data[i].destination, armd_parser_data);
+				if (status < ERROR_OK)
+					break;
+
+			}
+			if (status < ERROR_OK)
+				FreeCharacterizationFileData(file_data, i + 1);
+		}
+		else
+			status = ERROR_MEMORY_ALLOCATION_ERROR;
+	}
+	if (status >= ERROR_OK)
+	{
+		*character_files_num_out = character_files_num;
+		*file_data_out = file_data;
+	}
+	else
+	{
+		*character_files_num_out = 0;
+		*file_data_out = NULL;
+	}
+	return status;
+}
+
+int ParceEventSystemStart (SystemStartData** const system_start_data_out, ARMDParserData* armd_parser_data)
 {
 	int parce_events_system_start_status = ERROR_OK;
-	system_start_data = (SystemStartData*)calloc(1, sizeof(SystemStartData));
+	int status = ERROR_OK;;
+	SystemStartData* system_start_data = (SystemStartData*)calloc(1, sizeof(SystemStartData));
 	if (system_start_data)
 	{
 		GetValFromBuf(&system_start_data->Year, armd_parser_data, sizeof(WORD));
 		GetValFromBuf(&system_start_data->Month, armd_parser_data, sizeof(WORD));
 		GetValFromBuf(&system_start_data->Day, armd_parser_data, sizeof(WORD));
 		GetValFromBuf(&system_start_data->time, armd_parser_data, sizeof(DWORD));
-		//-----------------------------информация о файлах характеризации-----------------------------------------------------------//
-		BYTE character_files_num;
-		GetValFromBuf(&character_files_num, armd_parser_data, sizeof(BYTE));
-		if (character_files_num > 0)
-		{
-			system_start_data->file_data = (CharacterizationFileData*)calloc(character_files_num, sizeof(CharacterizationFileData));
-			if (system_start_data->file_data)
-			{
-				int i;
-				for (i = 0; i < character_files_num; i++)
-				{
-					BYTE len;
-					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
-					system_start_data->file_data[i].logical_name = (char*)calloc((size_t)len + 1, sizeof(char));
-					if(system_start_data->file_data[i].logical_name)
-						GetValFromBuf(system_start_data->file_data[i].logical_name, armd_parser_data, len);
-					else
-					{
-						parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
-						break;
-					}
-					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
-					system_start_data->file_data[i].physical_name = (char*)calloc((size_t)len + 1, sizeof(char));
-					if(system_start_data->file_data[i].physical_name)
-						GetValFromBuf(system_start_data->file_data[i].physical_name, armd_parser_data, len);
-					else
-					{
-						parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
-						break;
-					}
-
-					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
-					system_start_data->file_data[i].destination = (char*)calloc((size_t)len + 1, sizeof(char));
-					if(system_start_data->file_data[i].destination)
-						GetValFromBuf(system_start_data->file_data[i].destination, armd_parser_data, len);
-					else
-					{
-						parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
-						break;
-					}
-				}
-				if (parce_events_system_start_status < ERROR_OK)
-					FreeCharacterizationFileData(system_start_data->file_data, i);
-			}
-			else
-				parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
-		}
-		system_start_data->character_files_num = character_files_num;
-		//--------------------------------------------------------------------------------------------------------------------------//
+		status = GetCharacterizationFiles(&system_start_data->character_files_num, &system_start_data->file_data, armd_parser_data);
+		if (status < ERROR_OK)
+			parce_events_system_start_status = status;
 	}
 	else
 		parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
+	if (status < ERROR_OK)
+		FreeEventSystemStart(system_start_data);
+	return parce_events_system_start_status;
 }
 
 int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
@@ -110,31 +115,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				armd_parser_data->flag |= NO_EVENT_STATE;
 				break;
 			case EVENT_SYSTEM_START:
-				event_data->value.system_start_data = (SystemStartData*)calloc(1, sizeof(SystemStartData));
-				GetValFromBuf(&event_data->value.system_start_data->Year, armd_parser_data, sizeof(WORD));
-				GetValFromBuf(&event_data->value.system_start_data->Month, armd_parser_data, sizeof(WORD));
-				GetValFromBuf(&event_data->value.system_start_data->Day, armd_parser_data, sizeof(WORD));
-				GetValFromBuf(&event_data->value.system_start_data->time, armd_parser_data, sizeof(DWORD));
-				//-----------------------------информация о файлах характеризации-----------------------------------------------------------//
-				GetValFromBuf(&event_data->value.system_start_data->character_files_num, armd_parser_data, sizeof(BYTE));
-				event_data->value.system_start_data->file_data =
-					(CharacterizationFileData*)calloc(event_data->value.system_start_data->character_files_num, sizeof(CharacterizationFileData));
-				for (int i = 0; i < event_data->value.system_start_data->character_files_num; i++)
-				{
-					BYTE len;
-					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
-					event_data->value.system_start_data->file_data[i].logical_name = (char*)calloc((size_t)len + 1, sizeof(char));
-					GetValFromBuf(event_data->value.system_start_data->file_data[i].logical_name, armd_parser_data, len);
-
-					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
-					event_data->value.system_start_data->file_data[i].physical_name = (char*)calloc((size_t)len + 1, sizeof(char));
-					GetValFromBuf(event_data->value.system_start_data->file_data[i].physical_name, armd_parser_data, len);
-
-					GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
-					event_data->value.system_start_data->file_data[i].destination = (char*)calloc((size_t)len + 1, sizeof(char));
-					GetValFromBuf(event_data->value.system_start_data->file_data[i].destination, armd_parser_data, len);
-				}
-				//--------------------------------------------------------------------------------------------------------------------------//
+				ParceEventSystemStart(&event_data->value.system_start_data, armd_parser_data);
 				break;
 			case  EVENT_NEW_DATE:
 				event_data->value.time = (WORD*)calloc(3, sizeof(WORD));
