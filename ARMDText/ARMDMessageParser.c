@@ -278,11 +278,11 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 #define ARMD_TIME_LENGTH sizeof(DWORD) //sizeof(armd_data->time)
 #define ARMD_EVENTS_LENGTH sizeof(WORD) //sizeof(armd_data->events_len)
 	
-	if (armd_parser_data->index + ARMD_TIME_LENGTH + ARMD_EVENTS_LENGTH >= armd_parser_data->max_buf)
+	if (armd_parser_data->index + ARMD_TIME_LENGTH + ARMD_EVENTS_LENGTH < armd_parser_data->max_buf)
 	{
 		GetValFromBuf(&armd_data->time, armd_parser_data, sizeof(DWORD)); //время
 		GetValFromBuf(&armd_data->events_len, armd_parser_data, sizeof(WORD)); //длина всех событий
-		if (armd_parser_data->index + armd_data->events_len >= armd_parser_data->max_buf)
+		if (armd_parser_data->index + armd_data->events_len < armd_parser_data->max_buf)
 		{
 			BYTE number_of_processes;
 			GetValFromBuf(&number_of_processes, armd_parser_data, sizeof(BYTE));//количество всех процессов
