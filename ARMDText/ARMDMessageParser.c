@@ -5,8 +5,10 @@
 #include "ARMDParser.h"
 #include "ARMDMessageParser.h"
 #include "ARMDDisplayStrings.h"
+#include "Misc.h"
 
 void FreeCharacterizationFileData(CharacterizationFileData* file_data, BYTE character_files_num);
+void FreeEventSystemStart(SystemStartData* system_start_data);
 
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
 {
@@ -315,6 +317,13 @@ void FreeCharacterizationFileData(CharacterizationFileData * file_data, BYTE cha
 	free(file_data);
 }
 
+void FreeEventSystemStart(SystemStartData * system_start_data)
+{
+	if (system_start_data->file_data)
+		FreeCharacterizationFileData(system_start_data->file_data, system_start_data->character_files_num);
+	free(system_start_data);
+}
+
 int FreeEventData(ARMDMessageData* armd_data)
 {
 	if (armd_data == NULL)
@@ -334,19 +343,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 				break;
 			case EVENT_SYSTEM_START:
 				if (event_data->value.system_start_data)
-				{
-					if (event_data->value.system_start_data->file_data)
-					{
-						for (int i = 0; i < event_data->value.system_start_data->character_files_num; i++)
-						{
-							free(event_data->value.system_start_data->file_data[i].logical_name);
-							free(event_data->value.system_start_data->file_data[i].physical_name);
-							free(event_data->value.system_start_data->file_data[i].destination);
-						}
-						free(event_data->value.system_start_data->file_data);
-					}
-					free(event_data->value.system_start_data);
-				}
+					FreeEventSystemStart(event_data->value.system_start_data);
 				break;
 			case  EVENT_NEW_DATE:
 				if (event_data->value.time)
