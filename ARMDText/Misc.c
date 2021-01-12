@@ -1,7 +1,8 @@
 #include "Misc.h"
 
-char* ParceString(ARMDParserData* armd_parser_data)
+ int ParceString(char** const str_out, ARMDParserData* armd_parser_data)
 {
+	int status = NO_ERROR;
 	BYTE len;
 	GetValFromBuf(&len, armd_parser_data, sizeof(BYTE));
 	char* str = (char*)malloc(((size_t)len + 1) * sizeof(char));
@@ -15,5 +16,8 @@ char* ParceString(ARMDParserData* armd_parser_data)
 		else
 			*str = '\0';
 	}
-	return str;
+	else 
+		status = ERROR_MEMORY_ALLOCATION_ERROR;
+	*str_out = str;
+	return status;
 }
