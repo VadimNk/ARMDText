@@ -18,7 +18,7 @@ BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const 
 	return check;
 }
 
-//-----------------------------информация о файлах характеризации-----------------------------------------------------------//
+//информация о файлах характеризации
 int GetCharacterizationFiles(BYTE * const character_files_num_out, CharacterizationFileData** const file_data_out, ARMDParserData* const armd_parser_data)
 {
 	int i;
@@ -96,16 +96,19 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 	{
 		short number_of_events;
 		short i_event;
-
 		GetValFromBuf(&armd_data->proc_data[i_proc].proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
 		GetValFromBuf(&number_of_events, armd_parser_data, sizeof(short)); //количесво событий
 		armd_data->proc_data[i_proc].event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
 		for (i_event = 0; i_event < number_of_events; i_event++) //перебираем события
 		{
-			GetValFromBuf(&armd_inf_pos, armd_parser_data, sizeof(short)); //получаем индекс события в заголовке
 			ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[i_event];
-			event_data->event = armd_header_info->proc_info[armd_data->proc_data[i_proc].proc].event_info[armd_inf_pos].event;//получаем номер события, подставляя текущий процесс и индекс события
-																														 // в информацию о событиях, которую мы получили из заголовка
+
+			//определяем номер события(event_data->event) по индексу в массиве (armd_inf_pos)
+			GetValFromBuf(&armd_inf_pos, armd_parser_data, sizeof(short)); //получаем индекс массива, который содержит информацию о событиях, в том числе номер самого события
+			event_data->event = armd_header_info->proc_info[armd_data->proc_data[i_proc].proc].event_info[armd_inf_pos].event;	//получаем номер события, 
+																																//подставляя текущий процесс УЧПУ и индекс 
+																																//события в информацию о событиях,
+																																//которую мы получили из заголовка
 			switch (event_data->event)
 			{
 			case EVENT_NO_EVENT:
