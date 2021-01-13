@@ -97,7 +97,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 		short number_of_events;
 		short i_event;
 
-		GetValFromBuf(&armd_data->proc_data[i_proc].proc, armd_parser_data, sizeof(BYTE)); //текущий процесс
+		GetValFromBuf(&armd_data->proc_data[i_proc].proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
 		GetValFromBuf(&number_of_events, armd_parser_data, sizeof(short)); //количесво событий
 		armd_data->proc_data[i_proc].event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
 		for (i_event = 0; i_event < number_of_events; i_event++) //перебираем события
