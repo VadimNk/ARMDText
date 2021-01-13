@@ -68,7 +68,7 @@ int GetCharacterizationFiles(BYTE * const character_files_num_out, Characterizat
 int ParceEventSystemStart (SystemStartData** const system_start_data_out, ARMDParserData* armd_parser_data)
 {
 	int parce_events_system_start_status = ERROR_OK;
-	int status = ERROR_OK;;
+	int status = ERROR_OK;
 	SystemStartData* system_start_data = (SystemStartData*)calloc(1, sizeof(SystemStartData));
 	if (system_start_data)
 	{
@@ -83,7 +83,11 @@ int ParceEventSystemStart (SystemStartData** const system_start_data_out, ARMDPa
 	else
 		parce_events_system_start_status = ERROR_MEMORY_ALLOCATION_ERROR;
 	if (status < ERROR_OK)
+	{
 		FreeEventSystemStart(system_start_data);
+		system_start_data = NULL;
+	}
+	*system_start_data_out = system_start_data;
 	return parce_events_system_start_status;
 }
 
