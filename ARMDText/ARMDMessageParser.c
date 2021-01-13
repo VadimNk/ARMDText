@@ -7,7 +7,7 @@
 #include "ARMDDisplayStrings.h"
 #include "Misc.h"
 
-void FreeCharacterizationFileData(CharacterizationFileData* file_data, BYTE character_files_num);
+void FreeCharacterizationFiles(CharacterizationFileData* file_data, BYTE character_files_num);
 void FreeEventSystemStart(SystemStartData* system_start_data);
 
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
@@ -47,7 +47,7 @@ int GetCharacterizationFiles(BYTE * const character_files_num_out, Characterizat
 
 			}
 			if (status < ERROR_OK)
-				FreeCharacterizationFileData(file_data, i + 1);
+				FreeCharacterizationFiles(file_data, i + 1);
 		}
 		else
 			status = ERROR_MEMORY_ALLOCATION_ERROR;
@@ -287,7 +287,7 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 	return 0;
 }
 
-void FreeCharacterizationFileData(CharacterizationFileData * file_data, BYTE character_files_num)
+void FreeCharacterizationFiles(CharacterizationFileData * file_data, BYTE character_files_num)
 {
 	for (int i = 0; i < character_files_num; i++)
 	{
@@ -301,7 +301,7 @@ void FreeCharacterizationFileData(CharacterizationFileData * file_data, BYTE cha
 void FreeEventSystemStart(SystemStartData * system_start_data)
 {
 	if (system_start_data->file_data)
-		FreeCharacterizationFileData(system_start_data->file_data, system_start_data->character_files_num);
+		FreeCharacterizationFiles(system_start_data->file_data, system_start_data->character_files_num);
 	free(system_start_data);
 }
 
