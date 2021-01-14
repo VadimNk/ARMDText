@@ -145,7 +145,7 @@
   <ItemGroup>
     <ClCompile Include="ARMDDisplay.c" />
     <ClCompile Include="ARMDDisplyStrings.c" />
-    <ClCompile Include="ARMDEventParcer.c" />
+    <ClCompile Include="ARMDEventParser.c" />
     <ClCompile Include="ARMDFileReader.c" />
     <ClCompile Include="ARMDHeaderDisplay.c" />
     <ClCompile Include="ARMDHeaderParser.c" />
@@ -166,7 +166,7 @@
     <ClInclude Include="ARMDDisplay.h" />
     <ClInclude Include="ARMDDisplayStrings.h" />
     <ClInclude Include="ARMDError.h" />
-    <ClInclude Include="ARMDEventParcer.h" />
+    <ClInclude Include="ARMDEventParser.h" />
     <ClInclude Include="ARMDFileReader.h" />
     <ClInclude Include="ARMDHeaderDisplay.h" />
     <ClInclude Include="ARMDHeaderParser.h" />

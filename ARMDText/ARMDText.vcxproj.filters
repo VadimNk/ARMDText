@@ -63,7 +63,7 @@
     <ClCompile Include="Misc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ARMDEventParcer.c">
+    <ClCompile Include="ARMDEventParser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,7 +125,7 @@
     <ClInclude Include="Misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ARMDEventParcer.h">
+    <ClInclude Include="ARMDEventParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
