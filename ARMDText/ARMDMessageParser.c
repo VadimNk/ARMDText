@@ -51,8 +51,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				ParceEventSystemStart(&event_data->value.system_start_data, armd_parser_data);
 				break;
 			case  EVENT_NEW_DATE:
-				event_data->value.time = (WORD*)calloc(3, sizeof(WORD));
-				GetValFromBuf(event_data->value.time, armd_parser_data, 3 * sizeof(WORD));
+				ParceEventData(&event_data->value.time, armd_parser_data);
 				break;
 			case EVENT_WORK_MODE:
 			case EVENT_SYSTEM_STATE:

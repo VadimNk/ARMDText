@@ -7,5 +7,5 @@
 
 int ParceEventSystemStart(SystemStartData** const system_start_data_out, ARMDParserData* armd_parser_data);
 void FreeEventSystemStart(SystemStartData* system_start_data);
-
+int ParceEventData(WORD** const date_out, ARMDParserData* armd_parser_data);
 #endif
