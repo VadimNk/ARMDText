@@ -5,7 +5,7 @@
 #include "ARMDParser.h"
 #include "ARMDMessageParser.h"
 #include "ARMDDisplayStrings.h"
-#include "ARMDEventParcer.h"
+#include "ARMDEventParser.h"
 #include "Misc.h"
 
 void FreeCharacterizationFiles(CharacterizationFileData* file_data, BYTE character_files_num);
