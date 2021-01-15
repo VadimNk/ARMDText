@@ -2,6 +2,8 @@
 #include "ARMDParser.h"
 #include "Misc.h"
 
+//------------------event system start------------------//
+
 void FreeCharacterizationFiles(CharacterizationFileData* file_data, BYTE character_files_num)
 {
 	for (int i = 0; i < character_files_num; i++)
@@ -93,7 +95,14 @@ int ParceEventSystemStart(SystemStartData** const system_start_data_out, ARMDPar
 	return parce_events_system_start_status;
 }
 
-int ParceEventData(WORD** const date_out, ARMDParserData* armd_parser_data)
+//------------------event date--------------------------//
+
+void FreeEventDate(WORD* date)
+{
+	free(date);
+}
+
+int ParceEventDate(WORD** const date_out, ARMDParserData* armd_parser_data)
 {
 	int status = ERROR_OK;
 	#define YEAR_MONTH_DAY 3
