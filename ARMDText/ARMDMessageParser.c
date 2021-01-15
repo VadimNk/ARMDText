@@ -8,9 +8,6 @@
 #include "ARMDEventParser.h"
 #include "Misc.h"
 
-void FreeCharacterizationFiles(CharacterizationFileData* file_data, BYTE character_files_num);
-void FreeEventSystemStart(SystemStartData* system_start_data);
-
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
 {
 	BYTE check = 0;
