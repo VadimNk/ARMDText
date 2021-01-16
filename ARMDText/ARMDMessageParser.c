@@ -77,7 +77,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 			case EVENT_SPINDLE_POWER:
 				GetValFromBuf(&event_data->value.Float, armd_parser_data, sizeof(float));
 				break;
-			case EVENT_MES_ERR_PROG:
+			case EVENT_EMERGENCY_ERROR_MESSAGE:
 			{
 				event_data->value.emergency_error = (EmergData*)calloc(1, sizeof(EmergData));
 				GetValFromBuf(&event_data->value.emergency_error->error_code, armd_parser_data, sizeof(char));
@@ -266,7 +266,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 			case EVENT_CONTROL_PANEL_SWITCH_SPINDLE:
 			case EVENT_SPINDLE_POWER:
 				break;
-			case EVENT_MES_ERR_PROG:
+			case EVENT_EMERGENCY_ERROR_MESSAGE:
 				if (event_data->value.emergency_error)
 				{
 					if (event_data->value.emergency_error->msg != NULL)
