@@ -24,7 +24,7 @@ typedef struct _emerg_data {
     char error_code;
     char msg_len;
     char* msg;
-}EmergData;
+}EmergencyErrorMessage;
 
 //------MachineIdleTime--------------//
 typedef struct _idle {
@@ -88,7 +88,7 @@ typedef struct _armd_event_data {
         WORD* time;
         GFunctions* g_functions;
         ProgName* progname;
-        EmergData* emergency_error;
+        EmergencyErrorMessage* emergency_error;
         MachineIdleTime* machine_idletime;
         PlcError* alarm_plc_error;
         PlcError* mess_plc_error;

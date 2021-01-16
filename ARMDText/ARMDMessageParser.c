@@ -78,16 +78,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				GetValFromBuf(&event_data->value.Float, armd_parser_data, sizeof(float));
 				break;
 			case EVENT_EMERGENCY_ERROR_MESSAGE:
-			{
-				event_data->value.emergency_error = (EmergData*)calloc(1, sizeof(EmergData));
-				GetValFromBuf(&event_data->value.emergency_error->error_code, armd_parser_data, sizeof(char));
-				GetValFromBuf(&event_data->value.emergency_error->msg_len, armd_parser_data, sizeof(event_data->value.emergency_error->msg_len));
-				if (event_data->value.emergency_error->msg_len > 0)
-				{
-					event_data->value.emergency_error->msg = (char*)calloc((size_t)event_data->value.emergency_error->msg_len + 1, sizeof(char));
-					GetValFromBuf(event_data->value.emergency_error->msg, armd_parser_data, event_data->value.emergency_error->msg_len);
-				}
-			}
+				ParseEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
 			break;
 			case EVENT_PROGRAM_NAME:
 			{
