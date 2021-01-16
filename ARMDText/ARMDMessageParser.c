@@ -258,12 +258,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 			case EVENT_SPINDLE_POWER:
 				break;
 			case EVENT_EMERGENCY_ERROR_MESSAGE:
-				if (event_data->value.emergency_error)
-				{
-					if (event_data->value.emergency_error->msg != NULL)
-						free(event_data->value.emergency_error->msg);
-					free(event_data->value.emergency_error);
-				}
+				FreeEmergencyErrorMessage(event_data->value.emergency_error);
 				break;
 			case EVENT_PROGRAM_NAME:
 				if (event_data->value.progname)

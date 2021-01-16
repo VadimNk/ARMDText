@@ -139,3 +139,10 @@ int ParseEmergencyErrorMessage(EmergencyErrorMessage** const emergency_error_mes
 		status = ERROR_MEMORY_ALLOCATION_ERROR;
 	return status;
 }
+
+void FreeEmergencyErrorMessage(EmergencyErrorMessage* emergency_error_message)
+{
+	if (emergency_error_message->msg)
+		free(emergency_error_message->msg);
+	free(emergency_error_message);
+}

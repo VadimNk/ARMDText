@@ -10,5 +10,6 @@ void FreeEventSystemStart(SystemStartData* system_start_data);
 int ParceEventDate(WORD** const date_out, ARMDParserData* armd_parser_data);
 void FreeEventDate(WORD* date);
 int ParseEmergencyErrorMessage(EmergencyErrorMessage** const emergency_error_message_out, ARMDParserData* armd_parser_data);
+void FreeEmergencyErrorMessage(EmergencyErrorMessage* emergency_error_message);
 
 #endif
