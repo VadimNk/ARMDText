@@ -7,7 +7,7 @@ typedef struct _armd_parser_data {
     BYTE flag;
     DWORD index; //объем данных в байтах, который был обработан в текущем буфере 
     DWORD parsed_file_len; //объем данных в байтах, который был обработан во всём файле
-    DWORD max_buf; //максимальный объем буфера
+    size_t max_buf; //максимальный объем буфера
     BYTE* buf; //указатель на буфер, который читает из файла
 }ARMDParserData;
 
