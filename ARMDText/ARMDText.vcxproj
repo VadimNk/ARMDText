@@ -157,7 +157,7 @@
     <ClCompile Include="ARMDText.c" />
     <ClCompile Include="Keyboard.c" />
     <ClCompile Include="Misc.c" />
-    <ClCompile Include="ProgrammParameters.c" />
+    <ClCompile Include="ProgramParameters.c" />
     <ClCompile Include="StringsEn.c" />
     <ClCompile Include="StringsRu.c" />
   </ItemGroup>
@@ -179,7 +179,7 @@
     <ClInclude Include="ARMDText.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="ProgrammParameters.h" />
+    <ClInclude Include="ProgramParameters.h" />
     <ClInclude Include="StringsEn.h" />
     <ClInclude Include="StringsRu.h" />
   </ItemGroup>

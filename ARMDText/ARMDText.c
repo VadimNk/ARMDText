@@ -55,7 +55,7 @@
 #include "ARMDFileReader.h"
 #include "ARMDMessageParser.h"
 #include "Keyboard.h"
-#include "ProgrammParameters.h"
+#include "ProgramParameters.h"
 #include "ARMDDisplayStrings.h"
 #include "ARMDHeaderDisplay.h"
 
@@ -93,9 +93,9 @@ BOOL ReadDelay(clock_t delay)
 	return waked;
 }
 
-void ExitMain(_TCHAR* current_file_name, ProgrammParameters* programm_parameters)
+void ExitMain(_TCHAR* current_file_name, ProgramParameters* program_parameters)
 {
-	FreeParseProgramParameters(programm_parameters);
+	FreeParseProgramParameters(program_parameters);
 	if (current_file_name)
 		free(current_file_name);
 }
@@ -196,7 +196,7 @@ int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDParserDa
 	return 0;
 }
 
-int View(HANDLE console_output, ProgrammParameters* programm_parameters, KEYBOARD* keyboard, _TCHAR* current_file_name)
+int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD* keyboard, _TCHAR* current_file_name)
 {
 	ARMDParserData armd_parser_data;
 	ARMDProcessedData armd_processed_data;
@@ -207,10 +207,10 @@ int View(HANDLE console_output, ProgrammParameters* programm_parameters, KEYBOAR
 	memset(&armd_parser_data, 0, sizeof(ARMDParserData));
 	while (main_result >= ERROR_OK && !IsTerminated(keyboard))
 	{
-		BOOL waked = ReadDelay(programm_parameters->delay_time_ms);
+		BOOL waked = ReadDelay(program_parameters->delay_time_ms);
 		if (waked)
 			continue;
-		if (programm_parameters->specified_armd_file)
+		if (program_parameters->specified_armd_file)
 		{
 			if (armd_header_info)
 			{
@@ -221,7 +221,7 @@ int View(HANDLE console_output, ProgrammParameters* programm_parameters, KEYBOAR
 				}
 			}
 			else
-				_tcscpy_s(current_file_name, MAX_PATH, programm_parameters->specified_armd_file);
+				_tcscpy_s(current_file_name, MAX_PATH, program_parameters->specified_armd_file);
 		}
 		else
 		{
@@ -267,7 +267,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	int main_result = ERROR_OK;
 	KEYBOARD keyboard;
-	ProgrammParameters programm_parameters;
+	ProgramParameters program_parameters;
 	HANDLE console_output;
 	_TCHAR* current_file_name;
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -296,7 +296,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	SetDefaultLanguage();
 	if (set_mode_stdout_result >= 0 && set_mode_stdin_result >= 0 && set_mode_stderr_result >= 0 && set_console_output_result && set_console)
 	{
-		SetDefaultProgramParameters(&programm_parameters);
+		SetDefaultProgramParameters(&program_parameters);
 
 		console_output = GetStdHandle(STD_OUTPUT_HANDLE);// Получаем хэндл консоли //с помощью него будем менять цвет строк
 		if (console_output != INVALID_HANDLE_VALUE && console_output)
@@ -306,14 +306,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			current_file_name = (_TCHAR*)malloc(MAX_PATH * sizeof(_TCHAR));
 			if (current_file_name)
 			{
-				programm_parameters = ParseProgramParameters(argc, argv);
-				if (programm_parameters.status >= ERROR_OK)
+				program_parameters = ParseProgramParameters(argc, argv);
+				if (program_parameters.status >= ERROR_OK)
 				{
-					View(console_output, &programm_parameters, &keyboard, current_file_name);
+					View(console_output, &program_parameters, &keyboard, current_file_name);
 				}
 			}
 			SetConsoleTextAttribute(console_output, FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN);
-			ExitMain(current_file_name, &programm_parameters);
+			ExitMain(current_file_name, &program_parameters);
 			ReleaseKeyboard(&keyboard);
 		}
 		else

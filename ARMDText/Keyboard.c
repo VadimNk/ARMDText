@@ -14,7 +14,7 @@ void InitKeyboard(KEYBOARD* keyboard)
     if (keyboard)
     {
         keyboard->key_pressed_semaphore = CreateSemaphore(NULL, 0, MAX_KEYBOARD_SEMAPHORE_COUNT, _T("Keyboard semaphore."));
-        keyboard->programm_terminate = FALSE;
+        keyboard->program_terminate = FALSE;
         keyboard->keyboard_task_terminate = FALSE;
         keyboard->key = 0;
         keyboard->keyboard_task_handle = CreateThread(NULL, 64 * 1024, KeyboardTask, keyboard, CREATE_SUSPENDED, NULL);
@@ -108,15 +108,15 @@ int WaitKeyPressed(KEYBOARD* keyboard)
     return 0;
 }
 
-void TerminateProgramm(KEYBOARD* keyboard)
+void TerminateProgram(KEYBOARD* keyboard)
 {
     if (keyboard)
-        keyboard->programm_terminate = TRUE;
+        keyboard->program_terminate = TRUE;
 }
 
 BOOL IsTerminated(KEYBOARD* keyboard)
 {
-    return keyboard ? keyboard->programm_terminate : FALSE;
+    return keyboard ? keyboard->program_terminate : FALSE;
 }
 
 VOID ErrorExit(TCHAR* lpszMessage)
@@ -181,7 +181,7 @@ DWORD WINAPI KeyboardTask(void* argument)
                         if (key == VK_CANCEL || key == VK_BACK || key >= VK_TAB)
                         {
                             if (key == VK_ESCAPE)
-                                TerminateProgramm(keyboard);
+                                TerminateProgram(keyboard);
                             else
                                 if (key == VK_RETURN)
                                 {
