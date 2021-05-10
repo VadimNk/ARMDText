@@ -27,11 +27,12 @@ int ReadARMDFile(DWORD current_file_name_max_characters, _TCHAR* current_file_na
         DWORD file_len_to_read = new_file_len - armd_parser_data->parsed_file_len;//определяем количество байт, записанных в файл устройством ЧПУ с момента последнего чтения
         if (file_len_to_read > 0)
         {
-            armd_parser_data->max_buf = file_len_to_read; //необходим буфер такого же размера
-            void* tmp = (BYTE*)realloc(armd_parser_data->buf, ((size_t)armd_parser_data->max_buf + 1) * sizeof(BYTE));
+            size_t realloc_max_buf = file_len_to_read; //необходим буфер такого же размера;
+            void* tmp = (BYTE*)realloc(armd_parser_data->buf, (realloc_max_buf + 1) * sizeof(BYTE));
             if (tmp)
             {
                 armd_parser_data->buf = (BYTE*)tmp;
+                armd_parser_data->max_buf = realloc_max_buf;
                 DWORD result_offset = SetFilePointer(armd_file, armd_parser_data->parsed_file_len, NULL, FILE_BEGIN); //сдвигаем начальную позицию чтения из файла на уже обработанный объем данных в данном файле
                 if (result_offset == armd_parser_data->parsed_file_len)
                 {
