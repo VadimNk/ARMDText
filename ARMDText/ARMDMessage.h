@@ -75,7 +75,7 @@ typedef struct _subroutine_info {
 
 typedef struct _armd_event_data {
     short event;					//событие
-    union
+    union _value
     {
         char	Char;
         short	Short;
