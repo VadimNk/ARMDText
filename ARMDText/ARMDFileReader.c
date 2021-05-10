@@ -27,7 +27,7 @@ int ReadARMDFile(DWORD current_file_name_max_characters, _TCHAR* current_file_na
         DWORD file_len_to_read = new_file_len - armd_parser_data->parsed_file_len;//определяем количество байт, записанных в файл устройством ЧПУ с момента последнего чтения
         if (file_len_to_read > 0)
         {
-            size_t realloc_max_buf = file_len_to_read; //необходим буфер такого же размера;
+            size_t realloc_max_buf = file_len_to_read;
             void* tmp = (BYTE*)realloc(armd_parser_data->buf, (realloc_max_buf + 1) * sizeof(BYTE));
             if (tmp)
             {
