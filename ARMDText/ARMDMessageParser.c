@@ -16,6 +16,71 @@ BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const 
 	return check;
 }
 
+void EventProgramNameFree(ProgName* prog_name)
+{
+	if (prog_name->data)
+	{
+		for (short s_i = 0; s_i < prog_name->num; s_i++)
+		{
+			if (prog_name->data[s_i].name)
+				free(prog_name->data[s_i].name);
+			if (prog_name->data[s_i].path)
+				free(prog_name->data[s_i].path);
+		}
+		free(prog_name->data);
+	}
+	free(prog_name);
+}
+
+int EventProgramName(ProgName** prog_name, ARMDParserData* armd_parser_data)
+{
+	int event_program_name_result = ERROR_COMMON;
+	BYTE str_len = 0;
+	*prog_name = NULL;
+	{
+		(*prog_name) = (ProgName*)calloc(1, sizeof(ProgName));
+		if ((*prog_name))
+		{
+			GetValFromBuf(&(*prog_name)->num, armd_parser_data, sizeof(BYTE));
+			(*prog_name)->data = (ProgNameData*)calloc((*prog_name)->num, sizeof(ProgNameData));
+			if ((*prog_name)->data)
+			{
+				for (int i = 0; i < (*prog_name)->num; i++)
+				{
+					GetValFromBuf(&(*prog_name)->data[i].layer, armd_parser_data, sizeof(BYTE));
+					GetValFromBuf(&str_len, armd_parser_data, sizeof(str_len));
+					(*prog_name)->data[i].name = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
+					if ((*prog_name)->data[i].name)
+					{
+						GetValFromBuf((*prog_name)->data[i].name, armd_parser_data, str_len);
+						(*prog_name)->data[i].name[str_len] = '\0';
+						GetValFromBuf(&str_len, armd_parser_data, sizeof(str_len));
+						(*prog_name)->data[i].path = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
+						if ((*prog_name)->data[i].path)
+						{
+							GetValFromBuf((*prog_name)->data[i].path, armd_parser_data, str_len);
+							(*prog_name)->data[i].path[str_len] = '\0';
+						}
+						else
+							event_program_name_result = ERROR_MEMORY_ALLOCATION_ERROR;
+					}
+					else
+						event_program_name_result = ERROR_MEMORY_ALLOCATION_ERROR;
+				}
+			}
+			else
+				event_program_name_result = ERROR_MEMORY_ALLOCATION_ERROR;
+		}
+		else
+			event_program_name_result = ERROR_MEMORY_ALLOCATION_ERROR;
+		if (event_program_name_result < 0)
+		{
+			if (*prog_name)
+				EventProgramNameFree(*prog_name);
+		}
+	}
+	return event_program_name_result;
+}
 
 int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
 	BOOL* no_event_state, BYTE number_of_processes)
@@ -83,20 +148,20 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 			case EVENT_PROGRAM_NAME:
 			{
 				BYTE str_len = 0;
-				event_data->value.progname = (ProgName*)calloc(1, sizeof(ProgName));
-				GetValFromBuf(&event_data->value.progname->num, armd_parser_data, sizeof(BYTE));
-				event_data->value.progname->data = (ProgNameData*)calloc(event_data->value.progname->num, sizeof(ProgNameData));
-				for (int i = 0; i < event_data->value.progname->num; i++)
+				event_data->value.prog_name = (ProgName*)calloc(1, sizeof(ProgName));
+				GetValFromBuf(&event_data->value.prog_name->num, armd_parser_data, sizeof(BYTE));
+				event_data->value.prog_name->data = (ProgNameData*)calloc(event_data->value.prog_name->num, sizeof(ProgNameData));
+				for (int i = 0; i < event_data->value.prog_name->num; i++)
 				{
-					GetValFromBuf(&event_data->value.progname->data[i].layer, armd_parser_data, sizeof(BYTE));
+					GetValFromBuf(&event_data->value.prog_name->data[i].layer, armd_parser_data, sizeof(BYTE));
 					GetValFromBuf(&str_len, armd_parser_data, sizeof(str_len));
-					event_data->value.progname->data[i].name = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
-					GetValFromBuf(event_data->value.progname->data[i].name, armd_parser_data, str_len);
-					event_data->value.progname->data[i].name[str_len] = '\0';
+					event_data->value.prog_name->data[i].name = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
+					GetValFromBuf(event_data->value.prog_name->data[i].name, armd_parser_data, str_len);
+					event_data->value.prog_name->data[i].name[str_len] = '\0';
 					GetValFromBuf(&str_len, armd_parser_data, sizeof(str_len));
-					event_data->value.progname->data[i].path = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
-					GetValFromBuf(event_data->value.progname->data[i].path, armd_parser_data, str_len);
-					event_data->value.progname->data[i].path[str_len] = '\0';
+					event_data->value.prog_name->data[i].path = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
+					GetValFromBuf(event_data->value.prog_name->data[i].path, armd_parser_data, str_len);
+					event_data->value.prog_name->data[i].path[str_len] = '\0';
 				}
 			}
 			break;
@@ -216,7 +281,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 		return ERROR_INVALID_FUNCTION_PARAMETER;
 	if (armd_data->proc_data == NULL)
 		return ERROR_NULL_POINTER;
-	for (BYTE proc = 0; proc < armd_data->num_proc; proc++)
+	for (short proc = 0; proc < armd_data->num_proc; proc++)
 	{
 		for (short event = 0; event < armd_data->proc_data[proc].num_event; event++)
 		{
@@ -261,20 +326,20 @@ int FreeEventData(ARMDMessageData* armd_data)
 				FreeEmergencyErrorMessage(event_data->value.emergency_error);
 				break;
 			case EVENT_PROGRAM_NAME:
-				if (event_data->value.progname)
+				if (event_data->value.prog_name)
 				{
-					if (event_data->value.progname->data)
+					if (event_data->value.prog_name->data)
 					{
-						for (short s_i = 0; s_i < event_data->value.progname->num; s_i++)
+						for (short s_i = 0; s_i < event_data->value.prog_name->num; s_i++)
 						{
-							if (event_data->value.progname->data[s_i].name)
-								free(event_data->value.progname->data[s_i].name);
-							if (event_data->value.progname->data[s_i].path)
-								free(event_data->value.progname->data[s_i].path);
+							if (event_data->value.prog_name->data[s_i].name)
+								free(event_data->value.prog_name->data[s_i].name);
+							if (event_data->value.prog_name->data[s_i].path)
+								free(event_data->value.prog_name->data[s_i].path);
 						}
-						free(event_data->value.progname->data);
+						free(event_data->value.prog_name->data);
 					}
-					free(event_data->value.progname);
+					free(event_data->value.prog_name);
 				}
 				break;
 			case EVENT_BLOCK_NUMB_CTRL_PROG:

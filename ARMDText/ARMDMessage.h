@@ -87,7 +87,7 @@ typedef struct _armd_event_data {
         void* Void;
         WORD* time;
         GFunctions* g_functions;
-        ProgName* progname;
+        ProgName* prog_name;
         EmergencyErrorMessage* emergency_error;
         MachineIdleTime* machine_idletime;
         PlcError* alarm_plc_error;

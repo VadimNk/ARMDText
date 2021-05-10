@@ -108,16 +108,16 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
                     _tprintf(_T(" %s: %s| "), GetARMDString(I_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.emergency_error->msg));
                 break;
             case EVENT_PROGRAM_NAME:
-                for (int i = 0; i < event_data->value.progname->num; i++)
+                for (int i = 0; i < event_data->value.prog_name->num; i++)
                 {
-                    switch (event_data->value.progname->data[i].layer)
+                    switch (event_data->value.prog_name->data[i].layer)
                     {
                     case ROUTINE: _tprintf(_T("%s "), GetARMDString(I_ROUTINE)); break;
                     case SUBROUTINE1: _tprintf(_T("%s 1 "), GetARMDString(I_SUBROUTINE)); break;
                     case SUBROUTINE2: _tprintf(_T("%s 2 "), GetARMDString(I_SUBROUTINE)); break;
                     }
-                    _tprintf(_T("%s:%s| "), GetARMDString(I_NAME), ByteToWide(MAX_TMP, tmp, event_data->value.progname->data[i].name));
-                    _tprintf(_T("%s:%s| "), GetARMDString(I_PATH), ByteToWide(MAX_TMP, tmp, event_data->value.progname->data[i].path));
+                    _tprintf(_T("%s:%s| "), GetARMDString(I_NAME), ByteToWide(MAX_TMP, tmp, event_data->value.prog_name->data[i].name));
+                    _tprintf(_T("%s:%s| "), GetARMDString(I_PATH), ByteToWide(MAX_TMP, tmp, event_data->value.prog_name->data[i].path));
                 }
                 break;
             case EVENT_CONTROL_PANEL_SWITCH_JOG:
