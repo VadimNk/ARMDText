@@ -103,9 +103,12 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
                 _tprintf(_T("%s:%s| "), GetARMDString(I_SYSTEM_STATE), SYSTEM_STATE_ST[event_data->value.Char]);
                 break;
             case EVENT_EMERGENCY_ERROR_MESSAGE:
-                _tprintf(_T("%s: %d "), GetARMDString(I_PROGRAM_ERROR_MESSAGE), event_data->value.emergency_error->error_code);
-                if (event_data->value.emergency_error->msg_len != 0)
-                    _tprintf(_T(" %s: %s| "), GetARMDString(I_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.emergency_error->msg));
+                if (event_data->value.emergency_error)
+                {
+                    _tprintf(_T("%s: %d "), GetARMDString(I_PROGRAM_ERROR_MESSAGE), event_data->value.emergency_error->error_code);
+                    if (event_data->value.emergency_error->msg_len != 0)
+                        _tprintf(_T(" %s: %s| "), GetARMDString(I_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.emergency_error->msg));
+                }
                 break;
             case EVENT_PROGRAM_NAME:
                 for (int i = 0; i < event_data->value.prog_name->num; i++)
