@@ -1,5 +1,5 @@
-#ifndef EVENT_PROGRAM_NAME
-#define EVENT_PROGRAM_NAME
+#ifndef _EVENT_PROGRAM_NAME
+#define _EVENT_PROGRAM_NAME
 #include "ARMDEventParser.h"
 
 void EventProgramNameFree(ProgName* prog_name);
