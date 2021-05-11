@@ -34,7 +34,7 @@ int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_da
 		{
 			for (int i = 0; i < program_name->num; i++)
 			{
-				ProgNameData* program_name_data = program_name + i;
+				ProgNameData* program_name_data = program_name->data + i;
 				GetValFromBuf(&program_name_data->layer, armd_parser_data, sizeof(BYTE));
 				GetValFromBuf(&str_len, armd_parser_data, sizeof(BYTE));
 				program_name_data->name = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
