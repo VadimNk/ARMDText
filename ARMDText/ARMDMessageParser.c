@@ -6,6 +6,7 @@
 #include "ARMDMessageParser.h"
 #include "ARMDDisplayStrings.h"
 #include "ARMDEventParser.h"
+#include "EventProgramName.h"
 #include "Misc.h"
 
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
@@ -79,27 +80,10 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				break;
 			case EVENT_EMERGENCY_ERROR_MESSAGE:
 				ParseEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
-			break;
+				break;
 			case EVENT_PROGRAM_NAME:
-			{
-				BYTE str_len = 0;
-				event_data->value.prog_name = (ProgName*)calloc(1, sizeof(ProgName));
-				GetValFromBuf(&event_data->value.prog_name->num, armd_parser_data, sizeof(BYTE));
-				event_data->value.prog_name->data = (ProgNameData*)calloc(event_data->value.prog_name->num, sizeof(ProgNameData));
-				for (int i = 0; i < event_data->value.prog_name->num; i++)
-				{
-					GetValFromBuf(&event_data->value.prog_name->data[i].layer, armd_parser_data, sizeof(BYTE));
-					GetValFromBuf(&str_len, armd_parser_data, sizeof(str_len));
-					event_data->value.prog_name->data[i].name = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
-					GetValFromBuf(event_data->value.prog_name->data[i].name, armd_parser_data, str_len);
-					event_data->value.prog_name->data[i].name[str_len] = '\0';
-					GetValFromBuf(&str_len, armd_parser_data, sizeof(str_len));
-					event_data->value.prog_name->data[i].path = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
-					GetValFromBuf(event_data->value.prog_name->data[i].path, armd_parser_data, str_len);
-					event_data->value.prog_name->data[i].path[str_len] = '\0';
-				}
-			}
-			break;
+				EventProgramName(&event_data->value.prog_name, armd_parser_data);
+				break;
 			case EVENT_BLOCK_NUMB_CTRL_PROG:
 				GetValFromBuf(&event_data->value.Long, armd_parser_data, sizeof(event_data->value.Long));
 				break;
@@ -262,20 +246,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 				break;
 			case EVENT_PROGRAM_NAME:
 				if (event_data->value.prog_name)
-				{
-					if (event_data->value.prog_name->data)
-					{
-						for (short s_i = 0; s_i < event_data->value.prog_name->num; s_i++)
-						{
-							if (event_data->value.prog_name->data[s_i].name)
-								free(event_data->value.prog_name->data[s_i].name);
-							if (event_data->value.prog_name->data[s_i].path)
-								free(event_data->value.prog_name->data[s_i].path);
-						}
-						free(event_data->value.prog_name->data);
-					}
-					free(event_data->value.prog_name);
-				}
+					EventProgramNameFree(event_data->value.prog_name);
 				break;
 			case EVENT_BLOCK_NUMB_CTRL_PROG:
 				break;
