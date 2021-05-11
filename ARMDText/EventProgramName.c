@@ -19,7 +19,7 @@ void EventProgramNameFree(ProgName* prog_name)
 	free(prog_name);
 }
 
-int EventProgramName(ProgName** prog_name, ARMDParserData* armd_parser_data)
+int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_data)
 {
 	int event_program_name_result = ERROR_COMMON;
 	BYTE str_len = 0;
@@ -64,12 +64,12 @@ int EventProgramName(ProgName** prog_name, ARMDParserData* armd_parser_data)
 		event_program_name_result = ERROR_MEMORY_ALLOCATION_ERROR;
 	if (event_program_name_result < 0)
 	{
-		*prog_name = NULL;
-		if (*prog_name)
-			EventProgramNameFree(*prog_name);
+		*program_name_out = NULL;
+		if (*program_name_out)
+			EventProgramNameFree(*program_name_out);
 	}
 	else
-		*prog_name = program_name;
+		*program_name_out = program_name;
 
 	return event_program_name_result;
 }
