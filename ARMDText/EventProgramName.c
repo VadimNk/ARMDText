@@ -64,7 +64,7 @@ int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_da
 	}
 	else
 		event_program_name_result = ERROR_MEMORY_ALLOCATION_ERROR;
-	if (event_program_name_result < 0)
+	if (event_program_name_result < ERROR_OK)
 	{
 		*program_name_out = NULL;
 		if (program_name)
