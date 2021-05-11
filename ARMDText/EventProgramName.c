@@ -65,8 +65,8 @@ int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_da
 	if (event_program_name_result < 0)
 	{
 		*program_name_out = NULL;
-		if (*program_name_out)
-			EventProgramNameFree(*program_name_out);
+		if (program_name)
+			EventProgramNameFree(program_name);
 	}
 	else
 		*program_name_out = program_name;
