@@ -9,14 +9,16 @@ void EventProgramNameFree(ProgName* prog_name)
 	{
 		for (short s_i = 0; s_i < prog_name->num; s_i++)
 		{
-			if (prog_name->data[s_i].name)
-				free(prog_name->data[s_i].name);
-			if (prog_name->data[s_i].path)
-				free(prog_name->data[s_i].path);
+			ProgNameData* program_name_data = prog_name->data + s_i;
+			if (program_name_data->name)
+				free(program_name_data->name);
+			if (program_name_data->path)
+				free(program_name_data->path);
 		}
 		free(prog_name->data);
 	}
 	free(prog_name);
+
 }
 
 int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_data)
