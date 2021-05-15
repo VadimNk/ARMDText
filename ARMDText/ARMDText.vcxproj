@@ -156,6 +156,7 @@
     <ClCompile Include="ARMDProcessedData.c" />
     <ClCompile Include="ARMDText.c" />
     <ClCompile Include="EventProgramName.c" />
+    <ClCompile Include="EventSystemStart.c" />
     <ClCompile Include="Keyboard.c" />
     <ClCompile Include="Misc.c" />
     <ClCompile Include="ProgramParameters.c" />
@@ -179,6 +180,7 @@
     <ClInclude Include="ARMDProcessData.h" />
     <ClInclude Include="ARMDText.h" />
     <ClInclude Include="EventProgramName.h" />
+    <ClInclude Include="EventSystemStart.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ProgramParameters.h" />

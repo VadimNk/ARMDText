@@ -7,6 +7,7 @@
 #include "ARMDDisplayStrings.h"
 #include "ARMDEventParser.h"
 #include "EventProgramName.h"
+#include "EventSystemStart.h"
 #include "Misc.h"
 
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
@@ -49,7 +50,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				armd_parser_data->flag |= NO_EVENT_STATE;
 				break;
 			case EVENT_SYSTEM_START:
-				ParceEventSystemStart(&event_data->value.system_start_data, armd_parser_data);
+				EventSystemStart(&event_data->value.system_start_data, armd_parser_data);
 				break;
 			case  EVENT_NEW_DATE:
 				ParceEventDate(&event_data->value.time, armd_parser_data);
