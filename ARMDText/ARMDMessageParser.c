@@ -5,7 +5,6 @@
 #include "ARMDParser.h"
 #include "ARMDMessageParser.h"
 #include "ARMDDisplayStrings.h"
-#include "ARMDEventParser.h"
 #include "EventProgramName.h"
 #include "EventSystemStart.h"
 #include "EventDate.h"
