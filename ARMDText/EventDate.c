@@ -1,7 +1,6 @@
 #include "EventDate.h"
 #include "ARMDError.h"
 #include "Misc.h"
-//------------------event date--------------------------//
 
 void FreeEventDate(WORD* date)
 {
