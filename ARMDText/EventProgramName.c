@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <malloc.h>
 #include "EventProgramName.h"
-#include "ARMDEventParser.h"
+#include "Misc.h"
 
 void EventProgramNameFree(ProgName* prog_name)
 {
