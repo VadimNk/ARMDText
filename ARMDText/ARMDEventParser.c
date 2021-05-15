@@ -2,26 +2,6 @@
 #include "ARMDParser.h"
 #include "Misc.h"
 
-//------------------event date--------------------------//
-
-void FreeEventDate(WORD* date)
-{
-	free(date);
-}
-
-int ParceEventDate(WORD** const date_out, ARMDParserData* armd_parser_data)
-{
-	int status = ERROR_OK;
-	#define YEAR_MONTH_DAY 3
-	WORD* date = (WORD*)calloc(YEAR_MONTH_DAY, sizeof(WORD));
-	if (date)
-		GetValFromBuf(date, armd_parser_data, YEAR_MONTH_DAY * sizeof(WORD));
-	else
-		status = ERROR_MEMORY_ALLOCATION_ERROR;
-	*date_out = date;
-	return status;
-}
-
 //------------------------//
 int ParseEmergencyErrorMessage(EmergencyErrorMessage** const emergency_error_message_out, ARMDParserData* armd_parser_data)
 {

@@ -155,6 +155,7 @@
     <ClCompile Include="ARMDParserData.c" />
     <ClCompile Include="ARMDProcessedData.c" />
     <ClCompile Include="ARMDText.c" />
+    <ClCompile Include="EventDate.c" />
     <ClCompile Include="EventProgramName.c" />
     <ClCompile Include="EventSystemStart.c" />
     <ClCompile Include="Keyboard.c" />
@@ -179,6 +180,7 @@
     <ClInclude Include="ARMDParserData.h" />
     <ClInclude Include="ARMDProcessData.h" />
     <ClInclude Include="ARMDText.h" />
+    <ClInclude Include="EventDate.h" />
     <ClInclude Include="EventProgramName.h" />
     <ClInclude Include="EventSystemStart.h" />
     <ClInclude Include="Keyboard.h" />
