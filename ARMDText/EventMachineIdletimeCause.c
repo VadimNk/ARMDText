@@ -5,12 +5,12 @@ void FreeEventMachineIdletimeCause(MachineIdleTime* const machine_idletime)
 {
 	if (machine_idletime->idle)
 	{
-		for (short i = 0; i < machine_idletime->num; i++)
+		for (int i = 0; i < machine_idletime->num; i++)
 		{
 			Idle* idle = machine_idletime->idle + i;
-			if (idle->group_len > 0)
+			if (idle->group)
 				free(idle->group);
-			if (idle->len > 0)
+			if (idle->str)
 				free(idle->str);
 		}
 		free(machine_idletime->idle);
