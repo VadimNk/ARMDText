@@ -9,6 +9,7 @@
 #include "EventProgramName.h"
 #include "EventSystemStart.h"
 #include "EventDate.h"
+#include "EventEmergencyErrorMessage.h"
 #include "Misc.h"
 
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
@@ -81,7 +82,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				GetValFromBuf(&event_data->value.Float, armd_parser_data, sizeof(float));
 				break;
 			case EVENT_EMERGENCY_ERROR_MESSAGE:
-				ParseEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
+				EventEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
 				break;
 			case EVENT_PROGRAM_NAME:
 				EventProgramName(&event_data->value.prog_name, armd_parser_data);

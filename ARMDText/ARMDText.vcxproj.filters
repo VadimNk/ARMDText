@@ -81,6 +81,9 @@
     <ClCompile Include="EventDate.c">
       <Filter>Source Files\MessageEvents</Filter>
     </ClCompile>
+    <ClCompile Include="EventEmergencyErrorMessage.c">
+      <Filter>Source Files\MessageEvents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ARMDText.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files\MessageEvents</Filter>
     </ClInclude>
     <ClInclude Include="EventDate.h">
+      <Filter>Header Files\MessageEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="EventEmergencyErrorMessage.h">
       <Filter>Header Files\MessageEvents</Filter>
     </ClInclude>
   </ItemGroup>
