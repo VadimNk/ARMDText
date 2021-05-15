@@ -103,7 +103,6 @@ void ExitMain(_TCHAR* current_file_name, ProgramParameters* program_parameters)
 
 BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType)
 {
-	INPUT ip;
 	if (dwCtrlType == CTRL_CLOSE_EVENT)
 	{
 		while (1)
