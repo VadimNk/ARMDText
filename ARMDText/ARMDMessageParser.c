@@ -9,6 +9,7 @@
 #include "EventSystemStart.h"
 #include "EventDate.h"
 #include "EventEmergencyErrorMessage.h"
+#include "EventMachineIdletimeCause.h"
 #include "Misc.h"
 
 BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const DWORD finish_index)
@@ -94,26 +95,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				GetValFromBuf(&event_data->value.Word, armd_parser_data, sizeof(event_data->value.Word));
 				break;
 			case EVENT_MACHINE_IDLETIME_CAUSE:
-				event_data->value.machine_idletime = (MachineIdleTime*)calloc(1, sizeof(MachineIdleTime));
-				GetValFromBuf(&event_data->value.machine_idletime->num, armd_parser_data, sizeof(BYTE));
-				event_data->value.machine_idletime->idle = (Idle*)calloc(event_data->value.machine_idletime->num, sizeof(Idle));
-
-				for (int ai = 0; ai < event_data->value.machine_idletime->num; ai++)
-				{
-					GetValFromBuf(&event_data->value.machine_idletime->idle[ai].action, armd_parser_data, sizeof(char));
-					GetValFromBuf(&event_data->value.machine_idletime->idle[ai].group_len, armd_parser_data, sizeof(BYTE));
-					if (event_data->value.machine_idletime->idle[ai].group_len > 0)
-					{
-						event_data->value.machine_idletime->idle[ai].group = (char*)calloc((size_t)event_data->value.machine_idletime->idle[ai].group_len + 1, sizeof(char));
-						GetValFromBuf(event_data->value.machine_idletime->idle[ai].group, armd_parser_data, event_data->value.machine_idletime->idle[ai].group_len * sizeof(char));
-					}
-					GetValFromBuf(&event_data->value.machine_idletime->idle[ai].len, armd_parser_data, sizeof(BYTE));
-					if (event_data->value.machine_idletime->idle[ai].len > 0)
-					{
-						event_data->value.machine_idletime->idle[ai].str = (char*)calloc((size_t)event_data->value.machine_idletime->idle[ai].len + 1, sizeof(char));
-						GetValFromBuf(event_data->value.machine_idletime->idle[ai].str, armd_parser_data, event_data->value.machine_idletime->idle[ai].len * sizeof(char));
-					}
-				}
+				EventMachineIdletimeCause(&event_data->value.machine_idletime, armd_parser_data);
 				break;
 			case EVENT_ALARM_PLC_ERR:
 				event_data->value.alarm_plc_error = (PlcError*)calloc(1, sizeof(PlcError));
@@ -257,18 +239,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 				break;
 			case EVENT_MACHINE_IDLETIME_CAUSE:
 				if (event_data->value.machine_idletime)
-				{
-					for (short s_i = 0; s_i < event_data->value.machine_idletime->num; s_i++)
-					{
-						if (event_data->value.machine_idletime->idle[s_i].group_len > 0)
-							free(event_data->value.machine_idletime->idle[s_i].group);
-						if (event_data->value.machine_idletime->idle[s_i].len > 0)
-							free(event_data->value.machine_idletime->idle[s_i].str);
-					}
-					if (event_data->value.machine_idletime->idle)
-						free(event_data->value.machine_idletime->idle);
-					free(event_data->value.machine_idletime);
-				}
+					FreeEventMachineIdletimeCause(event_data->value.machine_idletime);
 				break;
 			case EVENT_ALARM_PLC_ERR:
 				free(event_data->value.alarm_plc_error->log);
