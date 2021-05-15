@@ -66,9 +66,6 @@
     <ClCompile Include="Misc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ARMDEventParser.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ProgramParameters.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -138,9 +135,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ARMDEventParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ProgramParameters.h">
