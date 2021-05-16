@@ -34,7 +34,7 @@ int ToLower(_TCHAR * tmp_str, DWORD max_str, _TCHAR* argv)
 	else
 		return -1;
 }
-// cmd example: /file 201902323.mon /delay 100 /lanuage russian
+// cmd example: /file 201902323.mon /delay 100 /language russian
 ProgramParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 {
 	_TCHAR tmp_str[MAX_PATH];
