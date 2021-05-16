@@ -34,7 +34,7 @@ int ToLower(_TCHAR * tmp_str, DWORD max_str, _TCHAR* argv)
 	else
 		return -1;
 }
-//-file 201902323.mon -delay 100 -lanuage russian
+// cmd example: /file 201902323.mon /delay 100 /lanuage russian
 ProgramParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 {
 	_TCHAR tmp_str[MAX_PATH];
@@ -45,7 +45,7 @@ ProgramParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 	{
 		if( ToLower(tmp_str, MAX_PATH, *(argv + i)) == 0)
 		{
-			if (_tcscmp(tmp_str, _T("-file")) == 0)
+			if (_tcscmp(tmp_str, _T("/file")) == 0)
 			{
 				if (i + 1 < argc)
 					i++;
@@ -68,7 +68,7 @@ ProgramParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 			}
 			else
 			{
-				if (_tcscmp(tmp_str, _T("-delay")) == 0)
+				if (_tcscmp(tmp_str, _T("/delay")) == 0)
 				{
 					if (i + 1 < argc)
 						i++;
@@ -82,7 +82,7 @@ ProgramParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 				}
 				else
 				{
-					if (_tcscmp(tmp_str, _T("-language")) == 0)
+					if (_tcscmp(tmp_str, _T("/language")) == 0)
 					{
 						if (i + 1 < argc)
 							i++;
