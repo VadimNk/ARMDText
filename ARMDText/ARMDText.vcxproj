@@ -153,7 +153,7 @@
     <ClCompile Include="ARMDParser.c" />
     <ClCompile Include="ARMDParserData.c" />
     <ClCompile Include="ARMDProcessedData.c" />
-    <ClCompile Include="ARMDString.c" />
+    <ClCompile Include="ARMDLine.c" />
     <ClCompile Include="ARMDText.c" />
     <ClCompile Include="EventDate.c" />
     <ClCompile Include="EventEmergencyErrorMessage.c" />
@@ -180,7 +180,7 @@
     <ClInclude Include="ARMDParser.h" />
     <ClInclude Include="ARMDParserData.h" />
     <ClInclude Include="ARMDProcessData.h" />
-    <ClInclude Include="ARMDString.h" />
+    <ClInclude Include="ARMDLine.h" />
     <ClInclude Include="ARMDText.h" />
     <ClInclude Include="EventDate.h" />
     <ClInclude Include="EventEmergencyErrorMessage.h" />

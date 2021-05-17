@@ -1,5 +1,6 @@
+// NOTE: Check misc.h 
 #include <malloc.h>
-#include "ARMDString.h"
+#include "ARMDLine.h"
 #include "ARMDError.h"
 #include "ARMDParserData.h"
 #include "Misc.h"

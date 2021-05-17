@@ -84,7 +84,7 @@
     <ClCompile Include="EventMachineIdletimeCause.c">
       <Filter>Source Files\MessageEvents</Filter>
     </ClCompile>
-    <ClCompile Include="ARMDString.c">
+    <ClCompile Include="ARMDLine.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,7 +161,7 @@
     <ClInclude Include="EventMachineIdletimeCause.h">
       <Filter>Header Files\MessageEvents</Filter>
     </ClInclude>
-    <ClInclude Include="ARMDString.h">
+    <ClInclude Include="ARMDLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
