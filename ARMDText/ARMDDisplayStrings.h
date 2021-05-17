@@ -1,6 +1,7 @@
 #ifndef _ARMD_SREINGS_DISPLAY_H_
+#define _ARMD_SREINGS_DISPLAY_H_
 #include <tchar.h>
-#include <Windows.h>
+#include <windows.h>
 
 #define ENGLISH_LANGUAGE 1
 #define RUSSIAN_LANGUAGE 2
