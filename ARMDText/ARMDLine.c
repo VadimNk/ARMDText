@@ -2,7 +2,6 @@
 #include <malloc.h>
 #include "ARMDLine.h"
 #include "ARMDError.h"
-#include "ARMDParserData.h"
 #include "Misc.h"
 
 void FreeARMDLine(ARMDLine armd_string)

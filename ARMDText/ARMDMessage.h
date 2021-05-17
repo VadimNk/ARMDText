@@ -4,6 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include "ARMDLine.h"
 //----начало структуры данных событий АРМД-------------------//
 typedef struct _g_functions {
     BYTE num;
@@ -93,7 +94,7 @@ typedef struct _armd_event_data {
         ProgName* prog_name;
         EmergencyErrorMessage* emergency_error;
         MachineIdleTime* machine_idletime;
-        PlcError* alarm_plc_error;
+        ARMDLine alarm_plc_error;
         PlcError* mess_plc_error;
         SystemStartData* system_start_data;
         CommandLine* command_line;

@@ -178,7 +178,7 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
                 }
                 break;
             case EVENT_ALARM_PLC_ERR:
-                _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_ALARM), ByteToWide(MAX_TMP, tmp, event_data->value.alarm_plc_error->log));
+                _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_ALARM), ByteToWide(MAX_TMP, tmp, event_data->value.alarm_plc_error->str));
                 break;
             case EVENT_MESS_PLC_ERR:
                 _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.mess_plc_error->log));

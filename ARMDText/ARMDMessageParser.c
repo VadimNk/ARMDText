@@ -100,10 +100,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				EventMachineIdletimeCause(&event_data->value.machine_idletime, armd_parser_data);
 				break;
 			case EVENT_ALARM_PLC_ERR:
-				event_data->value.alarm_plc_error = (PlcError*)calloc(1, sizeof(PlcError));
-				GetValFromBuf(&event_data->value.alarm_plc_error->log_len, armd_parser_data, sizeof(BYTE));
-				event_data->value.alarm_plc_error->log = (char*)calloc((size_t)event_data->value.alarm_plc_error->log_len + 1, sizeof(char));
-				GetValFromBuf(event_data->value.alarm_plc_error->log, armd_parser_data, event_data->value.alarm_plc_error->log_len);
+				GetARMDLine(&event_data->value.alarm_plc_error, armd_parser_data);
 				break;
 			case EVENT_MESS_PLC_ERR:
 				event_data->value.mess_plc_error = (PlcError*)calloc(1, sizeof(PlcError));
@@ -244,8 +241,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 					FreeEventMachineIdletimeCause(event_data->value.machine_idletime);
 				break;
 			case EVENT_ALARM_PLC_ERR:
-				free(event_data->value.alarm_plc_error->log);
-				free(event_data->value.alarm_plc_error);
+				FreeARMDLine(event_data->value.alarm_plc_error);
 				break;
 			case EVENT_MESS_PLC_ERR:
 				free(event_data->value.mess_plc_error->log);

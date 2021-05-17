@@ -3,6 +3,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include "ARMDParserData.h"
 
 typedef struct _armd_line_data {
 	BYTE len;
@@ -10,4 +11,8 @@ typedef struct _armd_line_data {
 }ARMDLineData;
 
 typedef ARMDLineData* ARMDLine;
+
+int GetARMDLine(ARMDLine* armd_string_out, ARMDParserData* armd_parser_data);
+void FreeARMDLine(ARMDLine armd_string);
+
 #endif
