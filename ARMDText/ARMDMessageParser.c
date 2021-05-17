@@ -21,6 +21,8 @@ BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const 
 }
 
 
+
+
 int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
 	BOOL* no_event_state, BYTE number_of_processes)
 {
