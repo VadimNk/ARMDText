@@ -1,5 +1,8 @@
 #ifndef _ARMD_HEADER_PARSER_H_
 #define _ARMD_HEADER_PARSER_H_
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include "ARMD.h"
 #include "ARMDParserData.h"

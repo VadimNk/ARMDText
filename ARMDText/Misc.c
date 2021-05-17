@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include "Misc.h"
 
  int ParceString(char** const str_out, ARMDParserData* armd_parser_data)

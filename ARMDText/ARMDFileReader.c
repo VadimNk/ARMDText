@@ -1,7 +1,9 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
+#include <windows.h>
 #include <malloc.h>
 #include <stdio.h>
-#include <windows.h>
 #include "ARMDParserData.h"
 #include "ARMDError.h"
 #include "ARMDHeaderParser.h"

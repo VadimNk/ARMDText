@@ -1,5 +1,8 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include <stdio.h>
+#include <malloc.h>
 #include "ProgramParameters.h"
 #include "ARMDError.h"
 #include "ARMDDisplayStrings.h"

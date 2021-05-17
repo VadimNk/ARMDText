@@ -1,5 +1,8 @@
 #ifndef _ARMD_MESSAGE_H
 #define _ARMD_MESSAGE_H
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 //----начало структуры данных событий АРМД-------------------//
 typedef struct _g_functions {

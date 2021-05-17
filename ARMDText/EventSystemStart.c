@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include "EventSystemStart.h"
 #include "ARMDParser.h"
 #include "ARMDError.h"

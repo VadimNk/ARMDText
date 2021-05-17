@@ -1,5 +1,8 @@
-#ifndef _ARMD_SREINGS_DISPLAY_H_
-#define _ARMD_SREINGS_DISPLAY_H_
+#ifndef _ARMD_STRINGS_DISPLAY_H_
+#define _ARMD_STRINGS_DISPLAY_H_
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
 #include <windows.h>
 

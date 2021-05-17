@@ -1,5 +1,8 @@
 #ifndef _ARMD_FILE_READER_H_
 #define _ARMD_FILE_READER_H_
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
 #include <windows.h>
 #include "ARMDParserData.h"

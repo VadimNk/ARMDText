@@ -1,19 +1,21 @@
+#include <malloc.h>
 #include "ARMDString.h"
 #include "ARMDError.h"
 #include "ARMDParserData.h"
+#include "Misc.h"
 
-void FreeARMDString(ARMDString armd_string)
+void FreeARMDLine(ARMDLine armd_string)
 {
 	if (armd_string->str)
 		free(armd_string->str);
 	free(armd_string);
 }
 
-int GetARMDString(ARMDString* armd_string_out, ARMDParserData* armd_parser_data)
+int GetARMDLine(ARMDLine* armd_string_out, ARMDParserData* armd_parser_data)
 {
 	int status = ERROR_COMMON;
-	ARMDString armd_string;
-	armd_string = (ARMDString)calloc(1, sizeof(ARMDStringData));
+	ARMDLine armd_string;
+	armd_string = (ARMDLine)calloc(1, sizeof(ARMDLineData));
 	if (armd_string)
 	{
 		GetValFromBuf(&armd_string->len, armd_parser_data, sizeof(BYTE));
@@ -34,7 +36,7 @@ int GetARMDString(ARMDString* armd_string_out, ARMDParserData* armd_parser_data)
 	else
 	{
 		*armd_string_out = NULL;
-		FreeARMDString(armd_string);
+		FreeARMDLine(armd_string);
 	}
 	return status;
 }

@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include "EventEmergencyErrorMessage.h"
 #include "ARMDError.h"
 #include "Misc.h"

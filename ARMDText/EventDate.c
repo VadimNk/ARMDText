@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include "EventDate.h"
 #include "ARMDError.h"
 #include "Misc.h"

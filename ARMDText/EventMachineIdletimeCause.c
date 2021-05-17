@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include "EventMachineIdletimeCause.h"
 #include "ARMDError.h"
 #include "Misc.h"
