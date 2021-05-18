@@ -199,9 +199,9 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
             case EVENT_G_FUNCTIONS:
 #define NO_G 0xFF
                 _tprintf(_T("%s: "), GetARMDString(I_G_FUNCTIONS));
-                for (int i = 0; i < event_data->value.g_functions->num; i++)
-                    if (event_data->value.g_functions->g[i] != NO_G)
-                        _tprintf(_T("%u "), event_data->value.g_functions->g[i]);
+                for (int i = 0; i < event_data->value.g_functions->len; i++)
+                    if (*(event_data->value.g_functions->str + i) != NO_G)
+                        _tprintf(_T("%u "), *(BYTE*)(event_data->value.g_functions->str + i));
                     else
                         _tprintf(_T("  "));
                 _tprintf(_T("| "));

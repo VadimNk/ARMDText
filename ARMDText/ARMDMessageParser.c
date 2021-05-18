@@ -111,10 +111,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				GetARMDLine(&event_data->value.command_line, armd_parser_data);
 				break;
 			case EVENT_G_FUNCTIONS:
-				event_data->value.g_functions = (GFunctions*)calloc(1, sizeof(GFunctions));
-				GetValFromBuf(&event_data->value.g_functions->num, armd_parser_data, sizeof(BYTE));
-				event_data->value.g_functions->g = (BYTE*)calloc(event_data->value.g_functions->num, sizeof(BYTE));
-				GetValFromBuf(event_data->value.g_functions->g, armd_parser_data, event_data->value.g_functions->num * sizeof(BYTE));
+				GetARMDLine(&event_data->value.g_functions, armd_parser_data);
 				break;
 			case EVENT_WNCMT: case EVENT_WNPRT: case EVENT_WPROG: case EVENT_WIZKD:
 				event_data->value.subroutine_info = (SubroutineInfo*)calloc(1, sizeof(SubroutineInfo));
@@ -245,8 +242,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 				FreeARMDLine(event_data->value.command_line);
 				break;
 			case EVENT_G_FUNCTIONS:
-				free(event_data->value.g_functions->g);
-				free(event_data->value.g_functions);
+				FreeARMDLine(event_data->value.g_functions);
 				break;
 			case EVENT_WNCMT:
 			case EVENT_WNPRT:
