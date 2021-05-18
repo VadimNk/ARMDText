@@ -168,16 +168,9 @@ void ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** 
 	}
 }
 
-int SetNextFileSpecifiedFileMode(ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
+int IsARMDFileEnded(ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
 {
-	if (armd_parser_data->parsed_file_len >= armd_header_info->file_size)
-	{//дочитали файл до конца на момент последней записи УЧПУ
-		_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_parser_data->index,
-			GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
-		FreeHeader(&armd_header_info);
-		return -1;
-	}
-	return 0;
+	return armd_parser_data->parsed_file_len >= armd_header_info->file_size ? ERROR_OK : ERROR_COMMON;
 }
 
 int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDParserData* armd_parser_data, ARMDHeaderInfo* armd_header_info,
@@ -215,8 +208,11 @@ int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD*
 		{
 			if (armd_header_info)
 			{
-				if (SetNextFileSpecifiedFileMode(armd_header_info, &armd_parser_data) < 0)
+				if (IsARMDFileEnded(armd_header_info, &armd_parser_data) >= 0)
 				{
+					_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_parser_data.index,
+						GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
+					FreeHeader(&armd_header_info);
 					int key = WaitKeyPressed(keyboard);
 					break;
 				}
