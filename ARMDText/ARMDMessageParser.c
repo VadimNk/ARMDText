@@ -108,10 +108,7 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 			case EVENT_PROCESS_COMMAND_LINE:
 			case EVENT_PROCESS_BLOCK_LINE:
 			case EVENT_COMMAND_LINE:
-				event_data->value.command_line = (CommandLine*)calloc(1, sizeof(CommandLine));
-				GetValFromBuf(&event_data->value.command_line->len, armd_parser_data, sizeof(BYTE));
-				event_data->value.command_line->str = (char*)calloc((size_t)event_data->value.command_line->len + 1, sizeof(char));
-				GetValFromBuf(event_data->value.command_line->str, armd_parser_data, event_data->value.command_line->len);
+				GetARMDLine(&event_data->value.command_line, armd_parser_data);
 				break;
 			case EVENT_G_FUNCTIONS:
 				event_data->value.g_functions = (GFunctions*)calloc(1, sizeof(GFunctions));
@@ -245,12 +242,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 			case EVENT_PROCESS_COMMAND_LINE:
 			case EVENT_PROCESS_BLOCK_LINE:
 			case EVENT_COMMAND_LINE:
-				if (event_data->value.command_line)
-				{
-					if (event_data->value.command_line->str)
-						free(event_data->value.command_line->str);
-					free(event_data->value.command_line);
-				}
+				FreeARMDLine(event_data->value.command_line);
 				break;
 			case EVENT_G_FUNCTIONS:
 				free(event_data->value.g_functions->g);
