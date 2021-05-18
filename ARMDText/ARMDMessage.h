@@ -98,7 +98,7 @@ typedef struct _armd_event_data {
         ARMDLine mess_plc_error;
         SystemStartData* system_start_data;
         ARMDLine command_line;
-        SubroutineInfo* subroutine_info;
+        ARMDLine subroutine_info;
     }value;							//значение события
 }ARMDEventData;
 
