@@ -236,7 +236,7 @@ int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD*
 			ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
 		}
 		for (DWORD i_number = store_index; i_number < armd_processed_data.number_items; i_number++)
-			FreeEventData(*(armd_processed_data.data + i_number));
+			FreeProcData(*(armd_processed_data.data + i_number));
 
 	}
 	if (armd_header_info)
