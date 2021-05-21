@@ -20,31 +20,30 @@ BYTE CheckMessageData(const BYTE * const buffer, const DWORD start_index, const 
 	return check;
 }
 
-
-
-
 int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
 	BOOL* no_event_state, BYTE number_of_processes)
 {
-	short armd_inf_pos;
-	short i_proc;
-	for (i_proc = 0; i_proc < number_of_processes; i_proc++) //перебираем процессы
+	int function_result = ERROR_OK;
+	short event_index_in_header_info;
+	short i;
+	for (i = 0; i < number_of_processes; i++) //перебираем процессы
 	{
 		short number_of_events;
-		short i_event;
-		GetValFromBuf(&armd_data->proc_data[i_proc].proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
+		short j;
+		ARMDProcessData* current_proc_data = armd_data->proc_data + i;
+		GetValFromBuf(&current_proc_data->proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
 		GetValFromBuf(&number_of_events, armd_parser_data, sizeof(short)); //количесво событий
-		armd_data->proc_data[i_proc].event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
-		for (i_event = 0; i_event < number_of_events; i_event++) //перебираем события
+		current_proc_data->event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
+		for (j = 0; j < number_of_events; j++) //перебираем события
 		{
-			ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[i_event];
+			ARMDEventData* event_data = current_proc_data->event_data + j;
 
-			//определяем номер события(event_data->event) по индексу в массиве (armd_inf_pos)
-			GetValFromBuf(&armd_inf_pos, armd_parser_data, sizeof(short)); //получаем индекс массива, который содержит информацию о событиях, в том числе номер самого события
-			event_data->event = armd_header_info->proc_info[armd_data->proc_data[i_proc].proc].event_info[armd_inf_pos].event;	//получаем номер события, 
-																																//подставляя текущий процесс УЧПУ и индекс 
-																																//события в информацию о событиях,
-																																//которую мы получили из заголовка
+			//определяем номер события(event_data->event), подставляя текущий процесс УЧПУ и индекс события (event_index_in_header_info) 
+			//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
+			GetValFromBuf(&event_index_in_header_info, armd_parser_data, sizeof(short));
+			ProcInfo* current_process_header_info = armd_header_info->proc_info + current_proc_data->proc;
+			SysARMDInfo* current_process_event_info = current_process_header_info->event_info;
+			event_data->event = (current_process_event_info + event_index_in_header_info)->event;
 			switch (event_data->event)
 			{
 			case EVENT_NO_EVENT:
@@ -124,9 +123,9 @@ int ParceEventsByProcesses(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_head
 				break;
 			}
 		}
-		armd_data->proc_data[i_proc].num_event = i_event;
+		current_proc_data->num_event = j;
 	}
-	armd_data->num_proc = (BYTE)i_proc;
+	armd_data->num_proc = (BYTE)i;
 }
 
 //Функция считывает события из буфера и распределяет их по структурам
@@ -176,7 +175,7 @@ int FreeEventData(ARMDMessageData* armd_data)
 		{
 			if (armd_data->proc_data[proc].event_data == NULL)
 				continue;
-			ARMDEventData* event_data = &armd_data->proc_data[proc].event_data[event];
+			ARMDEventData* event_data = (armd_data->proc_data + proc)->event_data + event;
 			switch (event_data->event)
 			{
 			case EVENT_NO_EVENT:
