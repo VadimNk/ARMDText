@@ -13,5 +13,6 @@ sizeof(((ARMDMessageData*)0)->num_proc) + sizeof(((ARMDProcessData*)0)->proc) + 
 
 BYTE CheckMessageData(const BYTE* const buffer, const DWORD start_index, const DWORD finish_index);
 int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data, BOOL* no_event_state);
-int FreeEventData(ARMDMessageData* armd_data);
+int FreeEventData(ARMDProcessData* armd_data);
+int FreeProcData(ARMDMessageData* armd_data);
 #endif // !_ARMD_BODY_PARSER_

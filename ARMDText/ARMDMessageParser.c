@@ -20,16 +20,102 @@ BYTE CheckMessageData(const BYTE* const buffer, const DWORD start_index, const D
 	return check;
 }
 
-int ParceEvents()
+int ParceEvent(ARMDEventData* event_data, ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
+	BOOL* no_event_state)
 {
-
+	int function_result = ERROR_OK;
+	short event_index_in_header_info;
+	//определяем номер события(event_data->event), подставляя текущий процесс УЧПУ и индекс события (event_index_in_header_info) 
+		//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
+	GetValFromBuf(&event_index_in_header_info, armd_parser_data, sizeof(short));
+	ProcInfo* current_process_header_info = armd_header_info->proc_info + current_proc_data->proc;
+	SysARMDInfo* current_process_event_info = current_process_header_info->event_info;
+	event_data->event = (current_process_event_info + event_index_in_header_info)->event;
+	switch (event_data->event)
+	{
+	case EVENT_NO_EVENT:
+		*no_event_state = TRUE; //устанавливаем флаг события "нет события"
+								//если событие окажется последним в буфере, то флаг просигнализирует о том, 
+								//что надо начать считывать файл с последней позиции в файле, увеличенной на размер прочитанного буфера и уменьшенной на длину события "нет события"
+		armd_parser_data->flag |= NO_EVENT_STATE;
+		break;
+	case EVENT_SYSTEM_START:
+		EventSystemStart(&event_data->value.system_start_data, armd_parser_data);
+		break;
+	case  EVENT_NEW_DATE:
+		EventDate(&event_data->value.time, armd_parser_data);
+		break;
+	case EVENT_WORK_MODE:
+	case EVENT_SYSTEM_STATE:
+	case EVENT_UAS:
+	case EVENT_UVR:
+	case EVENT_URL:
+	case EVENT_COMU:
+	case EVENT_CEFA:
+	case EVENT_MUSP:
+	case EVENT_REAZ:
+	case EVENT_PART_FINISHED:
+	case EVENT_RISP:
+	case EVENT_CONP:
+	case EVENT_SPEPN_REQ:
+	case EVENT_A_SPEPN:
+		GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
+		break;
+	case EVENT_FEED:
+	case EVENT_SPINDLE_SPEED:
+	case EVENT_CONTROL_PANEL_SWITCH_JOG:
+	case EVENT_CONTROL_PANEL_SWITCH_FEED:
+	case EVENT_CONTROL_PANEL_SWITCH_SPINDLE:
+	case EVENT_SPINDLE_POWER:
+		GetValFromBuf(&event_data->value.Float, armd_parser_data, sizeof(float));
+		break;
+	case EVENT_EMERGENCY_ERROR_MESSAGE:
+		EventEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
+		break;
+	case EVENT_PROGRAM_NAME:
+		EventProgramName(&event_data->value.prog_name, armd_parser_data);
+		break;
+	case EVENT_BLOCK_NUMB_CTRL_PROG:
+		GetValFromBuf(&event_data->value.Long, armd_parser_data, sizeof(event_data->value.Long));
+		break;
+	case EVENT_TOOL_NUMBER:
+	case EVENT_CORRECTOR_NUMBER:
+		GetValFromBuf(&event_data->value.Word, armd_parser_data, sizeof(event_data->value.Word));
+		break;
+	case EVENT_MACHINE_IDLETIME_CAUSE:
+		EventMachineIdletimeCause(&event_data->value.machine_idletime, armd_parser_data);
+		break;
+	case EVENT_ALARM_PLC_ERR:
+		GetARMDLine(&event_data->value.alarm_plc_error, armd_parser_data);
+		break;
+	case EVENT_MESS_PLC_ERR:
+		GetARMDLine(&event_data->value.mess_plc_error, armd_parser_data);
+		break;
+	case EVENT_PROCESS_COMMAND_LINE:
+	case EVENT_PROCESS_BLOCK_LINE:
+	case EVENT_COMMAND_LINE:
+		GetARMDLine(&event_data->value.command_line, armd_parser_data);
+		break;
+	case EVENT_G_FUNCTIONS:
+		GetARMDLine(&event_data->value.g_functions, armd_parser_data);
+		break;
+	case EVENT_WNCMT: case EVENT_WNPRT: case EVENT_WPROG: case EVENT_WIZKD:
+		GetARMDLine(&event_data->value.subroutine_info, armd_parser_data);
+		break;
+	case EVENT_TIME_SYNCH:
+		event_data->value.Char = 1;
+		break;
+	case EVENT_ARMD_SERVICE:
+		GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
+		break;
+	}
+	return function_result;
 }
 
 int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
 	BOOL* no_event_state, BYTE number_of_processes)
 {
 	int function_result = ERROR_OK;
-	short event_index_in_header_info;
 	short j;
 	short number_of_events;
 
@@ -41,91 +127,8 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 			for (j = 0; j < number_of_events; j++) //перебираем события
 			{
 				ARMDEventData* event_data = current_proc_data->event_data + j;
-
-				//определяем номер события(event_data->event), подставляя текущий процесс УЧПУ и индекс события (event_index_in_header_info) 
-				//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
-				GetValFromBuf(&event_index_in_header_info, armd_parser_data, sizeof(short));
-				ProcInfo* current_process_header_info = armd_header_info->proc_info + current_proc_data->proc;
-				SysARMDInfo* current_process_event_info = current_process_header_info->event_info;
-				event_data->event = (current_process_event_info + event_index_in_header_info)->event;
-				switch (event_data->event)
-				{
-				case EVENT_NO_EVENT:
-					*no_event_state = TRUE; //устанавливаем флаг события "нет события"
-											//если событие окажется последним в буфере, то флаг просигнализирует о том, 
-											//что надо начать считывать файл с последней позиции в файле, увеличенной на размер прочитанного буфера и уменьшенной на длину события "нет события"
-					armd_parser_data->flag |= NO_EVENT_STATE;
-					break;
-				case EVENT_SYSTEM_START:
-					EventSystemStart(&event_data->value.system_start_data, armd_parser_data);
-					break;
-				case  EVENT_NEW_DATE:
-					EventDate(&event_data->value.time, armd_parser_data);
-					break;
-				case EVENT_WORK_MODE:
-				case EVENT_SYSTEM_STATE:
-				case EVENT_UAS:
-				case EVENT_UVR:
-				case EVENT_URL:
-				case EVENT_COMU:
-				case EVENT_CEFA:
-				case EVENT_MUSP:
-				case EVENT_REAZ:
-				case EVENT_PART_FINISHED:
-				case EVENT_RISP:
-				case EVENT_CONP:
-				case EVENT_SPEPN_REQ:
-				case EVENT_A_SPEPN:
-					GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
-					break;
-				case EVENT_FEED:
-				case EVENT_SPINDLE_SPEED:
-				case EVENT_CONTROL_PANEL_SWITCH_JOG:
-				case EVENT_CONTROL_PANEL_SWITCH_FEED:
-				case EVENT_CONTROL_PANEL_SWITCH_SPINDLE:
-				case EVENT_SPINDLE_POWER:
-					GetValFromBuf(&event_data->value.Float, armd_parser_data, sizeof(float));
-					break;
-				case EVENT_EMERGENCY_ERROR_MESSAGE:
-					EventEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
-					break;
-				case EVENT_PROGRAM_NAME:
-					EventProgramName(&event_data->value.prog_name, armd_parser_data);
-					break;
-				case EVENT_BLOCK_NUMB_CTRL_PROG:
-					GetValFromBuf(&event_data->value.Long, armd_parser_data, sizeof(event_data->value.Long));
-					break;
-				case EVENT_TOOL_NUMBER:
-				case EVENT_CORRECTOR_NUMBER:
-					GetValFromBuf(&event_data->value.Word, armd_parser_data, sizeof(event_data->value.Word));
-					break;
-				case EVENT_MACHINE_IDLETIME_CAUSE:
-					EventMachineIdletimeCause(&event_data->value.machine_idletime, armd_parser_data);
-					break;
-				case EVENT_ALARM_PLC_ERR:
-					GetARMDLine(&event_data->value.alarm_plc_error, armd_parser_data);
-					break;
-				case EVENT_MESS_PLC_ERR:
-					GetARMDLine(&event_data->value.mess_plc_error, armd_parser_data);
-					break;
-				case EVENT_PROCESS_COMMAND_LINE:
-				case EVENT_PROCESS_BLOCK_LINE:
-				case EVENT_COMMAND_LINE:
-					GetARMDLine(&event_data->value.command_line, armd_parser_data);
-					break;
-				case EVENT_G_FUNCTIONS:
-					GetARMDLine(&event_data->value.g_functions, armd_parser_data);
-					break;
-				case EVENT_WNCMT: case EVENT_WNPRT: case EVENT_WPROG: case EVENT_WIZKD:
-					GetARMDLine(&event_data->value.subroutine_info, armd_parser_data);
-					break;
-				case EVENT_TIME_SYNCH:
-					event_data->value.Char = 1;
-					break;
-				case EVENT_ARMD_SERVICE:
-					GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
-					break;
-				}
+				ParceEvent(event_data, current_proc_data, armd_header_info, armd_parser_data, no_event_state);
+	
 			}
 			current_proc_data->num_event = j;
 		}
@@ -180,6 +183,7 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 		return ERROR_OUT_OF_RANGE;
 	return ERROR_OK;
 }
+
 int FreeProcData(ARMDMessageData* armd_data)
 {
 	int function_status = ERROR_OK;
