@@ -53,9 +53,9 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
         }
         if (armd_data->proc_data[i_proc].proc != 0)
             _tprintf(_T("%s:%u "), GetARMDString(I_PROCESS), armd_data->proc_data[i_proc].proc);
-        for (short event = 0; event < armd_data->proc_data[i_proc].num_event; event++)
+        for (short i_event = 0; i_event < armd_data->proc_data[i_proc].num_event; i_event++)
         {
-            ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[event];
+            ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[i_event];
             switch (event_data->event)
             {
             case EVENT_NO_EVENT:
