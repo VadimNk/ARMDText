@@ -19,11 +19,11 @@ BYTE CheckMessageData(const BYTE* const buffer, const DWORD start_index, const D
 		check ^= buffer[ch];
 	return check;
 }
-int ParseEventNumber(short* armd_event_out, ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
+int ParseEventNumber(ARMD_EVENT* armd_event_out, ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
 {
 	int function_result = ERROR_OK;
 	int result;
-	short armd_event;
+	ARMD_EVENT armd_event;
 	short event_index_in_header_info;
 	//определяем номер события(event_data->event), подставляя текущий процесс УЧПУ и индекс события (event_index_in_header_info) 
 	//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
@@ -40,10 +40,10 @@ int ParseEventNumber(short* armd_event_out, ARMDProcessData* current_proc_data, 
 	return function_result;
 }
 
-int ParceEvent(ARMDEventData* event_data, short armd_event, ARMDParserData* armd_parser_data, BOOL* no_event_state)
+int ParceEvent(ARMDEventData* event_data, ARMD_EVENT armd_event, ARMDParserData* armd_parser_data, BOOL* no_event_state)
 {
 	int function_result = ERROR_OK;
-	switch (event_data->event)
+	switch (armd_event)
 	{
 	case EVENT_NO_EVENT:
 		*no_event_state = TRUE; //устанавливаем флаг события "нет события"
