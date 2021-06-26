@@ -65,7 +65,7 @@
 #define SUBROUTINE2	2					//имя подпрограммы 2 уровня вложенности
 //---------------------------------------------------------------------------------------------------------------------------------------------//
 
-void GetValFromBuf(void* value, ARMDParserData* armd_parser_data, const DWORD value_size);
+int GetValFromBuf(void* value, ARMDParserData* armd_parser_data, const DWORD value_size);
 int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data,
     ARMDParserData* armd_parser_data, BOOL* no_event_state);
 
