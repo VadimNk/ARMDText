@@ -116,7 +116,7 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 	BOOL* no_event_state, BYTE number_of_processes)
 {
 	int function_result = ERROR_OK;
-	short j;
+	short i;
 	short number_of_events;
 
 		GetValFromBuf(&current_proc_data->proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
@@ -124,13 +124,13 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 		current_proc_data->event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
 		if (current_proc_data->event_data)
 		{
-			for (j = 0; j < number_of_events; j++) //перебираем события
+			for (i = 0; i < number_of_events; i++) //перебираем события
 			{
-				ARMDEventData* event_data = current_proc_data->event_data + j;
+				ARMDEventData* event_data = current_proc_data->event_data + i;
 				ParceEvent(event_data, current_proc_data, armd_header_info, armd_parser_data, no_event_state);
 	
 			}
-			current_proc_data->num_event = j;
+			current_proc_data->num_event = i;
 		}
 		else
 			function_result = ERROR_MEMORY_ALLOCATION_ERROR;
