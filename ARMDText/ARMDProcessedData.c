@@ -35,13 +35,13 @@ int EnsureCapacityOfProcessedData(ARMDProcessedData* armd_processed_data)
             if (tmp_processed_data)
             {
                 armd_processed_data->data = (ARMDMessageData**)tmp_processed_data;
-                for (DWORD d_i = armd_processed_data->max_items; d_i < new_max_items; d_i++)
+                for (DWORD dw_i = armd_processed_data->max_items; dw_i < new_max_items; dw_i++)
                 {
-                    armd_processed_data->data[d_i] = (ARMDMessageData*)malloc(sizeof(ARMDMessageData));
-                    if (!armd_processed_data->data[d_i])
+                    *(armd_processed_data->data + dw_i) = (ARMDMessageData*)malloc(sizeof(ARMDMessageData));
+                    if (!*(armd_processed_data->data + dw_i))
                     {
-                        for (DWORD d_j = armd_processed_data->max_items; d_j < d_i; d_j++)
-                            free(armd_processed_data->data[d_i]);
+                        for (DWORD dw_j = armd_processed_data->max_items; dw_j < dw_i; dw_j++)
+                            free(*(armd_processed_data->data + dw_i));
                         ensure_capacity_status = ERROR_MEMORY_ALLOCATION_ERROR;
                         break;
                     }
