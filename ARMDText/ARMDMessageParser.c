@@ -26,7 +26,7 @@ int ParceEvent(ARMDEventData* event_data, ARMDProcessData* current_proc_data, AR
 	int function_result = ERROR_OK;
 	short event_index_in_header_info;
 	//определяем номер события(event_data->event), подставляя текущий процесс УЧПУ и индекс события (event_index_in_header_info) 
-		//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
+	//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
 	GetValFromBuf(&event_index_in_header_info, armd_parser_data, sizeof(short));
 	ProcInfo* current_process_header_info = armd_header_info->proc_info + current_proc_data->proc;
 	SysARMDInfo* current_process_event_info = current_process_header_info->event_info;
