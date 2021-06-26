@@ -80,7 +80,7 @@ typedef struct _subroutine_info {
 typedef short ARMD_EVENT;
 
 typedef struct _armd_event_data {
-    ARMD_EVENT event;					//событие
+    ARMD_EVENT armd_event;					//событие
     union _value
     {
         char	Char;

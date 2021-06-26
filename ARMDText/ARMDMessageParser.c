@@ -121,7 +121,7 @@ int ParceEvent(ARMDEventData* event_data, ARMD_EVENT armd_event, ARMDParserData*
 		GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
 		break;
 	}
-	event_data->event = function_result >= ERROR_OK ? armd_event : EVENT_ERROR_EVENT;
+	event_data->armd_event = function_result >= ERROR_OK ? armd_event : EVENT_ERROR_EVENT;
 	return function_result;
 }
 
@@ -226,7 +226,7 @@ int FreeEventData(ARMDProcessData* armd_process_data)
 		for (short event = 0; event < armd_process_data->num_event; event++)
 		{
 			ARMDEventData* event_data = armd_process_data->event_data + event;
-			switch (event_data->event)
+			switch (event_data->armd_event)
 			{
 			case EVENT_NO_EVENT:
 				break;

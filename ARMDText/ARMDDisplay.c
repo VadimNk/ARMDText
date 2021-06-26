@@ -56,7 +56,7 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
         for (short i_event = 0; i_event < armd_data->proc_data[i_proc].num_event; i_event++)
         {
             ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[i_event];
-            switch (event_data->event)
+            switch (event_data->armd_event)
             {
             case EVENT_NO_EVENT:
                 _tprintf(GetARMDString(I_NO_EVENT));
