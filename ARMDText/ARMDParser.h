@@ -12,6 +12,7 @@
 #include "ARMDError.h"
 
 //----соотношение номеров событий и мнемонических названий--------------------------------------//
+#define EVENT_ERROR_EVENT					0
 #define EVENT_NO_EVENT						1
 #define EVENT_SYSTEM_START					2
 #define EVENT_NEW_DATE						3
