@@ -141,10 +141,15 @@ int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** a
 	armd_parser_data->index = 0;
 	if (!*armd_header_info) //заголовок ещё не считывался?
 	{//считываем заголовок
-		LoadHeader(armd_header_info, armd_parser_data);
-		_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_LOADER));
+		int result = LoadHeader(armd_header_info, armd_parser_data);
+		if(result >= ERROR_OK)
+			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_LOADER));
+		else
+		{
+			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_NOT_LOADED));
+		}
 	}
-	while (armd_parser_data->index < armd_parser_data->max_buf && !IsTerminated(keyboard))
+	while (result >= ERROR_OK && armd_parser_data->index < armd_parser_data->max_buf && !IsTerminated(keyboard))
 	{
 		parse_armd_buffer_result = GetARMDMessage(console_output, armd_header_info, armd_processed_data, armd_parser_data, &no_event_state);
 		if (parse_armd_buffer_result < 0)

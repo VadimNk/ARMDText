@@ -90,6 +90,7 @@ TCHAR* common_strings_en[] = {
         _T("file size have read from header"),
         _T("initial values"),
         _T("Header loaded"),
+        _T("Can't load header"),
         _T("Data check error"),
         _T("Data is corrupted."),
         _T("Fail to read ARMD file"),
