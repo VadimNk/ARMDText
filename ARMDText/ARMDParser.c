@@ -42,7 +42,7 @@ int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARM
 //функция копирует value_size байт из буфера в переменную value и сдвигает указатель на текущую позцию в буффере на value_size байт
 int GetValFromBuf(void* value, ARMDParserData* armd_parser_data, const DWORD value_size)
 {
-    if ((size_t)armd_parser_data->index + value_size < armd_parser_data->max_buf)
+    if ((size_t)armd_parser_data->index + value_size <= armd_parser_data->max_buf)
     {
         memcpy(value, armd_parser_data->buf + armd_parser_data->index, value_size);
         armd_parser_data->index += value_size;
