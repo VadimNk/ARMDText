@@ -232,7 +232,7 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 		function_status = ERROR_OUT_OF_RANGE;
 	if (function_status < ERROR_OK)
 	{
-		FreeProcData(armd_data->proc_data);
+		FreeProcData(armd_data);
 	}
 	return function_status;
 }
