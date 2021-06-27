@@ -109,7 +109,7 @@ void FreeHeader(ARMDHeaderInfo** armd_header_info)
             for (short i = 0; i < (*armd_header_info)->num_proc; i++)
             {
                 if ((*armd_header_info)->proc_info[i].event_info != NULL)
-                    free((*armd_header_info)->proc_info[i].event_info);
+                    free(((*armd_header_info)->proc_info + i)->event_info);
             }
             free((*armd_header_info)->proc_info);
         }
