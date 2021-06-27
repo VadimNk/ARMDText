@@ -26,6 +26,8 @@ int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARM
                     _tprintf(_T("%s. %s."), GetARMDString(I_DATA_CHECK_ERROR), GetARMDString(I_DATA_IS_CORRUPTED));
                     parse_armd_buffer_status = ERROR_WRONG_CHECK;
                 }
+                if (parse_armd_buffer_status < ERROR_OK)
+                    FreeProcData(armd_data);
             }
             else
                 parse_armd_buffer_status = res;
