@@ -19,11 +19,11 @@ BYTE CheckMessageData(const BYTE* const buffer, const DWORD start_index, const D
 		check ^= buffer[ch];
 	return check;
 }
-int ParseEventNumber(ARMD_EVENT* armd_event_out, ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
+int ParseEventNumber(ARMDEventId* armd_event_out, ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
 {
 	int function_result = ERROR_OK;
 	int result;
-	ARMD_EVENT armd_event;
+	ARMDEventId armd_event;
 	short event_index_in_header_info;
 	//определяем номер события(event_data->event), подставляя текущий процесс УЧПУ и индекс события (event_index_in_header_info) 
 	//в массив, который содержит информацио о событиях (current_process_event_info) в заголовке (armd_header_info)
@@ -32,7 +32,7 @@ int ParseEventNumber(ARMD_EVENT* armd_event_out, ARMDProcessData* current_proc_d
 	{
 		ProcInfo* current_process_header_info = armd_header_info->proc_info + current_proc_data->proc;
 		SysARMDInfo* current_process_event_info = current_process_header_info->event_info;
-		armd_event = (current_process_event_info + event_index_in_header_info)->event;
+		armd_event = (current_process_event_info + event_index_in_header_info)->event_id;
 	}
 	else
 		function_result = ERROR_OUT_OF_RANGE;
@@ -40,9 +40,10 @@ int ParseEventNumber(ARMD_EVENT* armd_event_out, ARMDProcessData* current_proc_d
 	return function_result;
 }
 
-int ParceEvent(ARMDEventData* event_data, ARMD_EVENT armd_event, ARMDParserData* armd_parser_data, BOOL* no_event_state)
+int ParceEventValue(ARMDEventValue* value, ARMDEventId armd_event, ARMDParserData* armd_parser_data, BOOL* no_event_state)
 {
 	int function_result = ERROR_OK;
+	int status = ERROR_OK;
 	switch (armd_event)
 	{
 	case EVENT_NO_EVENT:
@@ -52,10 +53,10 @@ int ParceEvent(ARMDEventData* event_data, ARMD_EVENT armd_event, ARMDParserData*
 		armd_parser_data->flag |= NO_EVENT_STATE;
 		break;
 	case EVENT_SYSTEM_START:
-		EventSystemStart(&event_data->value.system_start_data, armd_parser_data);
+		status = EventSystemStart(&value->system_start_data, armd_parser_data);
 		break;
 	case  EVENT_NEW_DATE:
-		EventDate(&event_data->value.time, armd_parser_data);
+		status = EventDate(&value->time, armd_parser_data);
 		break;
 	case EVENT_WORK_MODE:
 	case EVENT_SYSTEM_STATE:
@@ -71,7 +72,7 @@ int ParceEvent(ARMDEventData* event_data, ARMD_EVENT armd_event, ARMDParserData*
 	case EVENT_CONP:
 	case EVENT_SPEPN_REQ:
 	case EVENT_A_SPEPN:
-		GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
+		status = GetValFromBuf(&value->Char, armd_parser_data, sizeof(char));
 		break;
 	case EVENT_FEED:
 	case EVENT_SPINDLE_SPEED:
@@ -79,51 +80,67 @@ int ParceEvent(ARMDEventData* event_data, ARMD_EVENT armd_event, ARMDParserData*
 	case EVENT_CONTROL_PANEL_SWITCH_FEED:
 	case EVENT_CONTROL_PANEL_SWITCH_SPINDLE:
 	case EVENT_SPINDLE_POWER:
-		GetValFromBuf(&event_data->value.Float, armd_parser_data, sizeof(float));
+		status = GetValFromBuf(&value->Float, armd_parser_data, sizeof(float));
 		break;
 	case EVENT_EMERGENCY_ERROR_MESSAGE:
-		EventEmergencyErrorMessage(&event_data->value.emergency_error, armd_parser_data);
+		status = EventEmergencyErrorMessage(&value->emergency_error, armd_parser_data);
 		break;
 	case EVENT_PROGRAM_NAME:
-		EventProgramName(&event_data->value.prog_name, armd_parser_data);
+		status = EventProgramName(&value->prog_name, armd_parser_data);
 		break;
 	case EVENT_BLOCK_NUMB_CTRL_PROG:
-		GetValFromBuf(&event_data->value.Long, armd_parser_data, sizeof(event_data->value.Long));
+		status = GetValFromBuf(&value->Long, armd_parser_data, sizeof(value->Long));
 		break;
 	case EVENT_TOOL_NUMBER:
 	case EVENT_CORRECTOR_NUMBER:
-		GetValFromBuf(&event_data->value.Word, armd_parser_data, sizeof(event_data->value.Word));
+		status = GetValFromBuf(&value->Word, armd_parser_data, sizeof(value->Word));
 		break;
 	case EVENT_MACHINE_IDLETIME_CAUSE:
-		EventMachineIdletimeCause(&event_data->value.machine_idletime, armd_parser_data);
+		status = EventMachineIdletimeCause(&value->machine_idletime, armd_parser_data);
 		break;
 	case EVENT_ALARM_PLC_ERR:
-		GetARMDLine(&event_data->value.alarm_plc_error, armd_parser_data);
+		status = GetARMDLine(&value->alarm_plc_error, armd_parser_data);
 		break;
 	case EVENT_MESS_PLC_ERR:
-		GetARMDLine(&event_data->value.mess_plc_error, armd_parser_data);
+		status = GetARMDLine(&value->mess_plc_error, armd_parser_data);
 		break;
 	case EVENT_PROCESS_COMMAND_LINE:
 	case EVENT_PROCESS_BLOCK_LINE:
 	case EVENT_COMMAND_LINE:
-		GetARMDLine(&event_data->value.command_line, armd_parser_data);
+		status = GetARMDLine(&value->command_line, armd_parser_data);
 		break;
 	case EVENT_G_FUNCTIONS:
-		GetARMDLine(&event_data->value.g_functions, armd_parser_data);
+		status = GetARMDLine(&value->g_functions, armd_parser_data);
 		break;
 	case EVENT_WNCMT: case EVENT_WNPRT: case EVENT_WPROG: case EVENT_WIZKD:
-		GetARMDLine(&event_data->value.subroutine_info, armd_parser_data);
+		status = GetARMDLine(&value->subroutine_info, armd_parser_data);
 		break;
 	case EVENT_TIME_SYNCH:
-		event_data->value.Char = 1;
+		value->Char = 1;
 		break;
 	case EVENT_ARMD_SERVICE:
-		GetValFromBuf(&event_data->value.Char, armd_parser_data, sizeof(char));
+		status = GetValFromBuf(&value->Char, armd_parser_data, sizeof(char));
 		break;
+	default:
+		status = ERROR_COMMON;
 	}
-	event_data->armd_event = function_result >= ERROR_OK ? armd_event : EVENT_ERROR_EVENT;
+	if (status < ERROR_OK)
+	{
+		FreeEventValue(armd_event, value);
+		function_result = status;
+	}
 	return function_result;
 }
+
+int ParceEventData(ARMDEventData* event_data, ARMDEventId armd_event, ARMDParserData* armd_parser_data, BOOL* no_event_state)
+{
+	int status;
+	status = ParceEventValue(&event_data->value, armd_event, armd_parser_data, no_event_state);
+	if (status >= ERROR_OK)
+		event_data->event_id = armd_event;
+	return status;
+}
+
 
 int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
 	BOOL* no_event_state, BYTE number_of_processes)
@@ -133,28 +150,28 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 	short i;
 	short number_of_events;
 
-		GetValFromBuf(&current_proc_data->proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
-		GetValFromBuf(&number_of_events, armd_parser_data, sizeof(short)); //количесво событий
-		current_proc_data->event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
-		if (current_proc_data->event_data)
+	GetValFromBuf(&current_proc_data->proc, armd_parser_data, sizeof(BYTE)); //текущий процесс УЧПУ
+	GetValFromBuf(&number_of_events, armd_parser_data, sizeof(short)); //количесво событий
+	current_proc_data->event_data = (ARMDEventData*)calloc(number_of_events, sizeof(ARMDEventData));
+	if (current_proc_data->event_data)
+	{
+		for (i = 0; i < number_of_events; i++) //перебираем события
 		{
-			for (i = 0; i < number_of_events; i++) //перебираем события
+			short armd_event;
+			ARMDEventData* event_data = current_proc_data->event_data + i;
+			status = ParseEventNumber(&armd_event, current_proc_data, armd_header_info, armd_parser_data);
+			if (status >= ERROR_OK)
 			{
-				short armd_event;
-				ARMDEventData* event_data = current_proc_data->event_data + i;
-				status = ParseEventNumber(&armd_event, current_proc_data, armd_header_info, armd_parser_data);
-				if(status >= ERROR_OK)
-				{
-					ParceEvent(event_data, armd_event, armd_parser_data, no_event_state);
-				}
+				ParceEventData(event_data, armd_event, armd_parser_data, no_event_state);
 			}
-			current_proc_data->num_event = i;
 		}
-		else
-			function_result = ERROR_MEMORY_ALLOCATION_ERROR;
+		current_proc_data->num_event = i;
+	}
+	else
+		function_result = ERROR_MEMORY_ALLOCATION_ERROR;
 	if (function_result < ERROR_OK)
 	{
-		FreeEventData(current_proc_data);
+		FreeEventData(current_proc_data->event_data);
 	}
 	return function_result;
 }
@@ -208,7 +225,7 @@ int FreeProcData(ARMDMessageData* armd_data)
 	if (armd_data->proc_data)
 	{
 		for (short i = 0; i < armd_data->num_proc; i++)
-			FreeEventData(armd_data->proc_data + i);
+			FreeEventData((armd_data->proc_data + i)->event_data);
 		free(armd_data->proc_data);
 		armd_data->proc_data = NULL;
 	}
@@ -218,7 +235,94 @@ int FreeProcData(ARMDMessageData* armd_data)
 	return function_status;
 }
 
-int FreeEventData(ARMDProcessData* armd_process_data)
+int FreeEventValue(ARMDEventId event_id, ARMDEventValue *value)
+{
+	int function_status = ERROR_OK;
+	switch (event_id)
+	{
+	case EVENT_NO_EVENT:
+		break;
+	case EVENT_SYSTEM_START:
+		if (value->system_start_data)
+			FreeEventSystemStart(value->system_start_data);
+		break;
+	case  EVENT_NEW_DATE:
+		if (value->time)
+			FreeEventDate(value->time);
+		break;
+	case EVENT_WORK_MODE:
+	case EVENT_SYSTEM_STATE:
+	case EVENT_UAS:
+	case EVENT_UVR:
+	case EVENT_URL:
+	case EVENT_COMU:
+	case EVENT_CEFA:
+	case EVENT_MUSP:
+	case EVENT_REAZ:
+	case EVENT_PART_FINISHED:
+	case EVENT_RISP:
+	case EVENT_CONP:
+	case EVENT_SPEPN_REQ:
+	case EVENT_A_SPEPN:
+		break;
+	case EVENT_FEED:
+	case EVENT_SPINDLE_SPEED:
+	case EVENT_CONTROL_PANEL_SWITCH_JOG:
+	case EVENT_CONTROL_PANEL_SWITCH_FEED:
+	case EVENT_CONTROL_PANEL_SWITCH_SPINDLE:
+	case EVENT_SPINDLE_POWER:
+		break;
+	case EVENT_EMERGENCY_ERROR_MESSAGE:
+		FreeEmergencyErrorMessage(value->emergency_error);
+		break;
+	case EVENT_PROGRAM_NAME:
+		if (value->prog_name)
+			EventProgramNameFree(value->prog_name);
+		break;
+	case EVENT_BLOCK_NUMB_CTRL_PROG:
+		break;
+	case EVENT_TOOL_NUMBER:
+	case EVENT_CORRECTOR_NUMBER:
+		break;
+	case EVENT_MACHINE_IDLETIME_CAUSE:
+		if (value->machine_idletime)
+			FreeEventMachineIdletimeCause(value->machine_idletime);
+		break;
+	case EVENT_ALARM_PLC_ERR:
+		FreeARMDLine(value->alarm_plc_error);
+		break;
+	case EVENT_MESS_PLC_ERR:
+		FreeARMDLine(value->mess_plc_error);
+		break;
+	case EVENT_PROCESS_COMMAND_LINE:
+	case EVENT_PROCESS_BLOCK_LINE:
+	case EVENT_COMMAND_LINE:
+		FreeARMDLine(value->command_line);
+		break;
+	case EVENT_G_FUNCTIONS:
+		FreeARMDLine(value->g_functions);
+		break;
+	case EVENT_WNCMT:
+	case EVENT_WNPRT:
+	case EVENT_WPROG:
+	case EVENT_WIZKD:
+		FreeARMDLine(value->subroutine_info);
+		break;
+	case EVENT_TIME_SYNCH:
+		break;
+	case EVENT_ARMD_SERVICE:
+		break;
+	}
+	return function_status;
+}
+
+int FreeEventData(ARMDEventData* event_data)
+{
+	int status = FreeEventValue(event_data->event_id, &event_data->value);
+	return status;
+}
+
+int FreeProcessesEvents(ARMDProcessData* armd_process_data)
 {
 	int function_status = ERROR_OK;
 	if (armd_process_data->event_data)
@@ -226,81 +330,7 @@ int FreeEventData(ARMDProcessData* armd_process_data)
 		for (short event = 0; event < armd_process_data->num_event; event++)
 		{
 			ARMDEventData* event_data = armd_process_data->event_data + event;
-			switch (event_data->armd_event)
-			{
-			case EVENT_NO_EVENT:
-				break;
-			case EVENT_SYSTEM_START:
-				if (event_data->value.system_start_data)
-					FreeEventSystemStart(event_data->value.system_start_data);
-				break;
-			case  EVENT_NEW_DATE:
-				if (event_data->value.time)
-					FreeEventDate(event_data->value.time);
-				break;
-			case EVENT_WORK_MODE:
-			case EVENT_SYSTEM_STATE:
-			case EVENT_UAS:
-			case EVENT_UVR:
-			case EVENT_URL:
-			case EVENT_COMU:
-			case EVENT_CEFA:
-			case EVENT_MUSP:
-			case EVENT_REAZ:
-			case EVENT_PART_FINISHED:
-			case EVENT_RISP:
-			case EVENT_CONP:
-			case EVENT_SPEPN_REQ:
-			case EVENT_A_SPEPN:
-				break;
-			case EVENT_FEED:
-			case EVENT_SPINDLE_SPEED:
-			case EVENT_CONTROL_PANEL_SWITCH_JOG:
-			case EVENT_CONTROL_PANEL_SWITCH_FEED:
-			case EVENT_CONTROL_PANEL_SWITCH_SPINDLE:
-			case EVENT_SPINDLE_POWER:
-				break;
-			case EVENT_EMERGENCY_ERROR_MESSAGE:
-				FreeEmergencyErrorMessage(event_data->value.emergency_error);
-				break;
-			case EVENT_PROGRAM_NAME:
-				if (event_data->value.prog_name)
-					EventProgramNameFree(event_data->value.prog_name);
-				break;
-			case EVENT_BLOCK_NUMB_CTRL_PROG:
-				break;
-			case EVENT_TOOL_NUMBER:
-			case EVENT_CORRECTOR_NUMBER:
-				break;
-			case EVENT_MACHINE_IDLETIME_CAUSE:
-				if (event_data->value.machine_idletime)
-					FreeEventMachineIdletimeCause(event_data->value.machine_idletime);
-				break;
-			case EVENT_ALARM_PLC_ERR:
-				FreeARMDLine(event_data->value.alarm_plc_error);
-				break;
-			case EVENT_MESS_PLC_ERR:
-				FreeARMDLine(event_data->value.mess_plc_error);
-				break;
-			case EVENT_PROCESS_COMMAND_LINE:
-			case EVENT_PROCESS_BLOCK_LINE:
-			case EVENT_COMMAND_LINE:
-				FreeARMDLine(event_data->value.command_line);
-				break;
-			case EVENT_G_FUNCTIONS:
-				FreeARMDLine(event_data->value.g_functions);
-				break;
-			case EVENT_WNCMT:
-			case EVENT_WNPRT:
-			case EVENT_WPROG:
-			case EVENT_WIZKD:
-				FreeARMDLine(event_data->value.subroutine_info);
-				break;
-			case EVENT_TIME_SYNCH:
-				break;
-			case EVENT_ARMD_SERVICE:
-				break;
-			}
+			FreeEventData(event_data);
 		}
 		free(armd_process_data->event_data);
 		armd_process_data->event_data = NULL;

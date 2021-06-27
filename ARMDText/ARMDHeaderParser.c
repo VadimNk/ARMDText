@@ -71,7 +71,7 @@ int LoadHeader(ARMDHeaderInfo** const armd_header_info_p, ARMDParserData* armd_p
                     for (short j = 0; j < armd_header_info->proc_info[i].num_events; j++)
                     {
                         //параметры мониторинга
-                        GetValFromBuf(&armd_header_info->proc_info[i].event_info[j].event, armd_parser_data, sizeof(short));
+                        GetValFromBuf(&armd_header_info->proc_info[i].event_info[j].event_id, armd_parser_data, sizeof(short));
                         GetValFromBuf(&armd_header_info->proc_info[i].event_info[j].account_type, armd_parser_data, sizeof(int));
                         GetValFromBuf(&armd_header_info->proc_info[i].event_info[j].account_param, armd_parser_data, sizeof(float));
                         GetValFromBuf(&armd_header_info->proc_info[i].event_info[j].units, armd_parser_data, sizeof(BYTE));

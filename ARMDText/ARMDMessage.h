@@ -77,31 +77,31 @@ typedef struct _subroutine_info {
     char* str;
 }SubroutineInfo;
 
-typedef short ARMD_EVENT;
+typedef short ARMDEventId;
+typedef union _armd_value {
+    char	Char;
+    short	Short;
+    int		Int;
+    float	Float;
+    long	Long;
+    WORD	Word;
+    char* str;
+    void* Void;
+    WORD* time;
+    ARMDLine g_functions;
+    ProgName* prog_name;
+    EmergencyErrorMessage* emergency_error;
+    MachineIdleTime* machine_idletime;
+    ARMDLine alarm_plc_error;
+    ARMDLine mess_plc_error;
+    SystemStartData* system_start_data;
+    ARMDLine command_line;
+    ARMDLine subroutine_info;
+}ARMDEventValue;
 
 typedef struct _armd_event_data {
-    ARMD_EVENT armd_event;					//событие
-    union _value
-    {
-        char	Char;
-        short	Short;
-        int		Int;
-        float	Float;
-        long	Long;
-        WORD	Word;
-        char* str;
-        void* Void;
-        WORD* time;
-        ARMDLine g_functions;
-        ProgName* prog_name;
-        EmergencyErrorMessage* emergency_error;
-        MachineIdleTime* machine_idletime;
-        ARMDLine alarm_plc_error;
-        ARMDLine mess_plc_error;
-        SystemStartData* system_start_data;
-        ARMDLine command_line;
-        ARMDLine subroutine_info;
-    }value;							//значение события
+    ARMDEventId event_id;					//событие
+    ARMDEventValue value;
 }ARMDEventData;
 
 //----конец структуры данных событий АРМД-------------------//
