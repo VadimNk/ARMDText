@@ -162,7 +162,12 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 			status = ParseEventNumber(&armd_event, current_proc_data, armd_header_info, armd_parser_data);
 			if (status >= ERROR_OK)
 			{
-				ParceEventData(event_data, armd_event, armd_parser_data, no_event_state);
+				int parce_event_status = ParceEventData(event_data, armd_event, armd_parser_data, no_event_state);
+				if (parce_event_status < ERROR_OK)
+				{
+					function_result = parce_event_status;
+					break;
+				}
 			}
 		}
 		current_proc_data->num_event = i;
@@ -171,7 +176,8 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 		function_result = ERROR_MEMORY_ALLOCATION_ERROR;
 	if (function_result < ERROR_OK)
 	{
-		FreeEventData(current_proc_data->event_data);
+		//FreeEventData(current_proc_data->event_data);
+		FreeProcessesEvents(current_proc_data);
 	}
 	return function_result;
 }
@@ -180,6 +186,7 @@ int ParceEventsByProcesses(ARMDProcessData* current_proc_data, ARMDHeaderInfo* a
 int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data,
 	BOOL* no_event_state)
 {
+	int function_status = ERROR_OK;
 	int i;
 	*no_event_state = FALSE;//сбрасываем флаг, даже если были события "нет события", т.к. буфер еще не закончился 
 
@@ -201,22 +208,33 @@ int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_inf
 				{
 					for (i = 0; i < number_of_processes; i++) //перебираем процессы
 					{
-						ParceEventsByProcesses(armd_data->proc_data + i, armd_header_info, armd_parser_data, no_event_state, number_of_processes);
+						int parce_events_by_processes_status = ParceEventsByProcesses(armd_data->proc_data + i,
+							armd_header_info, armd_parser_data, no_event_state, number_of_processes);
+						if (parce_events_by_processes_status < ERROR_OK)
+						{
+							function_status = parce_events_by_processes_status;
+							break;
+						}
+
 					}
 					armd_data->num_proc = (BYTE)i;
-
-					GetValFromBuf(&armd_data->check, armd_parser_data, sizeof(BYTE));
+					if(function_status >= ERROR_OK)
+						GetValFromBuf(&armd_data->check, armd_parser_data, sizeof(BYTE));
 				}
 				else
-					return ERROR_COMMON;
+					function_status = ERROR_COMMON;
 			}
 		}
 		else
-			return ERROR_OUT_OF_RANGE;
+			function_status = ERROR_OUT_OF_RANGE;
 	}
 	else
-		return ERROR_OUT_OF_RANGE;
-	return ERROR_OK;
+		function_status = ERROR_OUT_OF_RANGE;
+	if (function_status < ERROR_OK)
+	{
+		FreeProcData(armd_data->proc_data);
+	}
+	return function_status;
 }
 
 int FreeProcData(ARMDMessageData* armd_data)

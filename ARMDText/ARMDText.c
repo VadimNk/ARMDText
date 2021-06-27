@@ -133,7 +133,7 @@ void ViewBlock(HANDLE console_output, KEYBOARD* keyboard, DWORD store_index, ARM
 	}
 }
 
-void ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDParserData* armd_parser_data)
+int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDParserData* armd_parser_data)
 {
 	int result = ERROR_OK;
 	BOOL no_event_state = FALSE;
@@ -161,6 +161,7 @@ void ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** 
 		//то необходимо вернуться на позицию в файле до события "нет события". Период возникновения события "нет события"
 		//(запись на диск накопленного буффера) устанавливается инструкцией RecordTime в файле MonCfg.ini.
 	}
+	return result;
 }
 
 int IsARMDFileEnded(ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
@@ -232,8 +233,11 @@ int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD*
 		int read_armd_file_status = ReadARMDFile(MAX_PATH, current_file_name, &armd_parser_data);
 		if (read_armd_file_status == ERROR_OK)
 		{
-			ARMDParseBlock(console_output, keyboard, &armd_header_info, &armd_processed_data, &armd_parser_data);
-			ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
+			int parce_block_result = ARMDParseBlock(console_output, keyboard, &armd_header_info, &armd_processed_data, &armd_parser_data);
+			if (parce_block_result >= ERROR_OK)
+				ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
+			else
+				main_result = parce_block_result;
 		}
 		for (DWORD i_number = store_index; i_number < armd_processed_data.number_items; i_number++)
 			FreeProcData(*(armd_processed_data.data + i_number));
@@ -301,7 +305,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				program_parameters = ParseProgramParameters(argc, argv);
 				if (program_parameters.status >= ERROR_OK)
 				{
-					View(console_output, &program_parameters, &keyboard, current_file_name);
+					main_result = View(console_output, &program_parameters, &keyboard, current_file_name);
 				}
 			}
 			SetConsoleTextAttribute(console_output, FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN);

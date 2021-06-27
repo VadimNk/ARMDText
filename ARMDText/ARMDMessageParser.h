@@ -15,5 +15,6 @@ BYTE CheckMessageData(const BYTE* const buffer, const DWORD start_index, const D
 int ParseARMDMessage(ARMDMessageData* armd_data, ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data, BOOL* no_event_state);
 int FreeEventData(ARMDEventData* armd_data);
 int FreeEventValue(ARMDEventId event_id, ARMDEventValue* value);
+int FreeProcessesEvents(ARMDProcessData* armd_process_data);
 int FreeProcData(ARMDMessageData* armd_data);
 #endif // !_ARMD_BODY_PARSER_
