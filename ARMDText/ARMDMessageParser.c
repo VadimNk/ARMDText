@@ -243,7 +243,7 @@ int FreeProcData(ARMDMessageData* armd_data)
 	if (armd_data->proc_data)
 	{
 		for (short i = 0; i < armd_data->num_proc; i++)
-			FreeEventData((armd_data->proc_data + i)->event_data);
+			FreeEventData(armd_data->proc_data + i);
 		free(armd_data->proc_data);
 		armd_data->proc_data = NULL;
 	}
@@ -334,9 +334,13 @@ int FreeEventValue(ARMDEventId event_id, ARMDEventValue *value)
 	return function_status;
 }
 
-int FreeEventData(ARMDEventData* event_data)
+int FreeEventData(ARMDProcessData* process_data)
 {
-	int status = FreeEventValue(event_data->event_id, &event_data->value);
+	int status = 0;
+	for (short i_event = 0; i_event < process_data->num_event; i_event++)
+	{
+		status = FreeEventValue((process_data->event_data + i_event)->event_id, &(process_data->event_data + i_event)->value);
+	}
 	return status;
 }
 
@@ -348,7 +352,7 @@ int FreeProcessesEvents(ARMDProcessData* armd_process_data)
 		for (short event = 0; event < armd_process_data->num_event; event++)
 		{
 			ARMDEventData* event_data = armd_process_data->event_data + event;
-			FreeEventData(event_data);
+			FreeEventValue(event_data->event_id, &event_data->value);
 		}
 		free(armd_process_data->event_data);
 		armd_process_data->event_data = NULL;
