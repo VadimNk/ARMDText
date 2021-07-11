@@ -1,3 +1,4 @@
+//текст
 #ifndef _ARMD_FILE_READER_H_
 #define _ARMD_FILE_READER_H_
 

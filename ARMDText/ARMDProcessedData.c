@@ -3,7 +3,7 @@
 #include <malloc.h>
 #include "ARMDParser.h"
 #include "ARMDMessageParser.h"
-#include "ARMDProcessData.h"
+#include "ARMDProcessedData.h"
 #include "ARMDDisplayStrings.h"
 
 void FreeProcessedData(ARMDProcessedData* armd_processed_data)

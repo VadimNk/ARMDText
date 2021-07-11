@@ -128,7 +128,7 @@
     <ClInclude Include="ARMDParserData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ARMDProcessData.h">
+    <ClInclude Include="ARMDProcessedData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Keyboard.h">

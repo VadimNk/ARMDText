@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include "ARMDProcessData.h"
+#include "ARMDProcessedData.h"
 #include "ARMDParserData.h"
 
 //длина события "нет события" в байтах

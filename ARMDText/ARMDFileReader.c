@@ -7,7 +7,7 @@
 #include "ARMDParserData.h"
 #include "ARMDError.h"
 #include "ARMDHeaderParser.h"
-#include "ARMDProcessData.h"
+#include "ARMDProcessedData.h"
 #include "ARMDDisplayStrings.h"
 #include "ARMDMessageParser.h"
 

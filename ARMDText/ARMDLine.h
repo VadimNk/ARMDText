@@ -1,5 +1,5 @@
-#ifndef _ARMD_LINE_H
-#define _ARMD_LINE_H
+#ifndef _ARMD_LINE_H_
+#define _ARMD_LINE_H_
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>

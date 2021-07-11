@@ -78,6 +78,7 @@ typedef struct _subroutine_info {
 }SubroutineInfo;
 
 typedef short ARMDEventId;
+
 typedef union _armd_value {
     char	Char;
     short	Short;

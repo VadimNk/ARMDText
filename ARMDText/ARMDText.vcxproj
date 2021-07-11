@@ -179,7 +179,7 @@
     <ClInclude Include="ARMDMessageParser.h" />
     <ClInclude Include="ARMDParser.h" />
     <ClInclude Include="ARMDParserData.h" />
-    <ClInclude Include="ARMDProcessData.h" />
+    <ClInclude Include="ARMDProcessedData.h" />
     <ClInclude Include="ARMDLine.h" />
     <ClInclude Include="ARMDText.h" />
     <ClInclude Include="EventDate.h" />

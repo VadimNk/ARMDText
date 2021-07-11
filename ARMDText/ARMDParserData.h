@@ -14,6 +14,5 @@ typedef struct _armd_parser_data {
     BYTE* buf; //указатель на буфер, который читает из файла
 }ARMDParserData;
 
-void FreeARMDParseData(ARMDParserData* armd_parser_data);
 
 #endif // !_ARMD_PARSER_DATA
