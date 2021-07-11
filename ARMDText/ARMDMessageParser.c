@@ -336,11 +336,18 @@ int FreeEventValue(ARMDEventId event_id, ARMDEventValue *value)
 
 int FreeEventData(ARMDProcessData* process_data)
 {
-	int status = 0;
+	int status = ERROR_OK;
+	int free_event_value_status;
 	for (short i_event = 0; i_event < process_data->num_event; i_event++)
 	{
-		status = FreeEventValue((process_data->event_data + i_event)->event_id, &(process_data->event_data + i_event)->value);
+		free_event_value_status = FreeEventValue((process_data->event_data + i_event)->event_id, &(process_data->event_data + i_event)->value);
+		if (free_event_value_status < ERROR_OK)
+		{
+			status = free_event_value_status;
+			break;
+		}
 	}
+	free(process_data->event_data);
 	return status;
 }
 
