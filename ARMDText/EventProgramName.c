@@ -22,7 +22,7 @@ void EventProgramNameFree(ProgName* prog_name)
 
 }
 
-int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_data)
+int EventProgramName(ProgName** program_name_out, ARMDFileReaderData* armd_file_reader_data)
 {
 	int event_program_name_result = ERROR_COMMON;
 	BYTE str_len = 0;
@@ -31,25 +31,25 @@ int EventProgramName(ProgName** program_name_out, ARMDParserData* armd_parser_da
 	program_name = (ProgName*)calloc(1, sizeof(ProgName));
 	if (program_name)
 	{
-		GetValFromBuf(&program_name->num, armd_parser_data, sizeof(BYTE));
+		GetValFromBuf(&program_name->num, armd_file_reader_data, sizeof(BYTE));
 		program_name->data = (ProgNameData*)calloc(program_name->num, sizeof(ProgNameData));
 		if (program_name->data)
 		{
 			for (int i = 0; i < program_name->num; i++)
 			{
 				ProgNameData* program_name_data = program_name->data + i;
-				GetValFromBuf(&program_name_data->layer, armd_parser_data, sizeof(BYTE));
-				GetValFromBuf(&str_len, armd_parser_data, sizeof(BYTE));
+				GetValFromBuf(&program_name_data->layer, armd_file_reader_data, sizeof(BYTE));
+				GetValFromBuf(&str_len, armd_file_reader_data, sizeof(BYTE));
 				program_name_data->name = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
 				if (program_name_data->name)
 				{
-					GetValFromBuf(program_name_data->name, armd_parser_data, str_len);
+					GetValFromBuf(program_name_data->name, armd_file_reader_data, str_len);
 					*(program_name_data->name + str_len) = '\0';
-					GetValFromBuf(&str_len, armd_parser_data, sizeof(BYTE));
+					GetValFromBuf(&str_len, armd_file_reader_data, sizeof(BYTE));
 					program_name_data->path = (char*)malloc(((size_t)str_len + 1) * sizeof(char));
 					if (program_name_data->path)
 					{
-						GetValFromBuf(program_name_data->path, armd_parser_data, str_len);
+						GetValFromBuf(program_name_data->path, armd_file_reader_data, str_len);
 						*(program_name_data->path + str_len) = '\0';
 						event_program_name_result = ERROR_OK;
 					}

@@ -18,13 +18,13 @@ void FreeEventMachineIdletimeCause(MachineIdleTime* const machine_idletime)
 		free(machine_idletime);
 	}
 }
-int EventMachineIdletimeCause(MachineIdleTime** const machine_idletime_out, ARMDParserData* armd_parser_data)
+int EventMachineIdletimeCause(MachineIdleTime** const machine_idletime_out, ARMDFileReaderData* armd_file_reader_data)
 {
 	int status = ERROR_OK;
 	MachineIdleTime *machine_idletime = (MachineIdleTime*)calloc(1, sizeof(MachineIdleTime));
 	if (machine_idletime)
 	{
-		GetValFromBuf(&machine_idletime->num, armd_parser_data, sizeof(BYTE));
+		GetValFromBuf(&machine_idletime->num, armd_file_reader_data, sizeof(BYTE));
 		if (machine_idletime->num)
 		{
 			machine_idletime->idle = (Idle*)calloc(machine_idletime->num, sizeof(Idle));
@@ -33,22 +33,22 @@ int EventMachineIdletimeCause(MachineIdleTime** const machine_idletime_out, ARMD
 				for (int i = 0; i < machine_idletime->num; i++)
 				{
 					Idle* idle = machine_idletime->idle + i;
-					GetValFromBuf(&idle->action, armd_parser_data, sizeof(char));
-					GetValFromBuf(&idle->group_len, armd_parser_data, sizeof(BYTE));
+					GetValFromBuf(&idle->action, armd_file_reader_data, sizeof(char));
+					GetValFromBuf(&idle->group_len, armd_file_reader_data, sizeof(BYTE));
 					if (idle->group_len > 0)
 					{
 						idle->group = (char*)calloc((size_t)idle->group_len + 1, sizeof(char));
 						if (idle->group)
-							GetValFromBuf(idle->group, armd_parser_data, idle->group_len * sizeof(char));
+							GetValFromBuf(idle->group, armd_file_reader_data, idle->group_len * sizeof(char));
 						else
 							status = ERROR_MEMORY_ALLOCATION_ERROR;
 					}
-					GetValFromBuf(&idle->len, armd_parser_data, sizeof(BYTE));
+					GetValFromBuf(&idle->len, armd_file_reader_data, sizeof(BYTE));
 					if (idle->len > 0)
 					{
 						idle->str = (char*)calloc((size_t)idle->len + 1, sizeof(char));
 						if (idle->str)
-							GetValFromBuf(idle->str, armd_parser_data, idle->len * sizeof(char));
+							GetValFromBuf(idle->str, armd_file_reader_data, idle->len * sizeof(char));
 						else
 							status = ERROR_MEMORY_ALLOCATION_ERROR;
 					}

@@ -133,15 +133,15 @@ void ViewBlock(HANDLE console_output, KEYBOARD* keyboard, DWORD store_index, ARM
 	}
 }
 
-int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDParserData* armd_parser_data)
+int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDFileReaderData* armd_file_reader_data)
 {
 	int result = ERROR_OK;
 	BOOL no_event_state = FALSE;
 	int parse_armd_buffer_result = ERROR_COMMON;
-	armd_parser_data->index = 0;
+	armd_file_reader_data->index = 0;
 	if (!*armd_header_info) //заголовок ещё не считывался?
 	{//считываем заголовок
-		int result = LoadHeader(armd_header_info, armd_parser_data);
+		int result = LoadHeader(armd_header_info, armd_file_reader_data);
 		if(result >= ERROR_OK)
 			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_LOADER));
 		else
@@ -149,9 +149,9 @@ int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** a
 			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_NOT_LOADED));
 		}
 	}
-	while (result >= ERROR_OK && armd_parser_data->index < armd_parser_data->max_buf && !IsTerminated(keyboard))
+	while (result >= ERROR_OK && armd_file_reader_data->index < armd_file_reader_data->max_buf && !IsTerminated(keyboard))
 	{
-		parse_armd_buffer_result = GetARMDMessage(console_output, armd_header_info, armd_processed_data, armd_parser_data, &no_event_state);
+		parse_armd_buffer_result = GetARMDMessage(console_output, armd_header_info, armd_processed_data, armd_file_reader_data, &no_event_state);
 		if (parse_armd_buffer_result < 0)
 		{
 			result = parse_armd_buffer_result;
@@ -160,7 +160,7 @@ int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** a
 	}
 	if (parse_armd_buffer_result >= 0)
 	{
-		armd_parser_data->parsed_file_len += armd_parser_data->index;//прибавляем к прочитанному объему данных из файла длину буфера
+		armd_file_reader_data->parsed_file_len += armd_file_reader_data->index;//прибавляем к прочитанному объему данных из файла длину буфера
 		//т.к. событие "нет события" затирается следующим событием причем это может быть повторное событие "нет события" 
 		//с новым временем появления, которое возникает в системе, если не происходило никаких изменений в значениях мониторируемых переменных, 
 		//то необходимо вернуться на позицию в файле до события "нет события". Период возникновения события "нет события"
@@ -169,23 +169,23 @@ int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** a
 	return result;
 }
 
-int IsARMDFileEnded(ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
+int IsARMDFileEnded(ARMDHeaderInfo* armd_header_info, ARMDFileReaderData* armd_file_reader_data)
 {
-	return armd_parser_data->parsed_file_len >= armd_header_info->file_size ? ERROR_OK : ERROR_COMMON;
+	return armd_file_reader_data->parsed_file_len >= armd_header_info->file_size ? ERROR_OK : ERROR_COMMON;
 }
 
-int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDParserData* armd_parser_data, ARMDHeaderInfo* armd_header_info,
+int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDFileReaderData* armd_file_reader_data, ARMDHeaderInfo* armd_header_info,
 	ARMDProcessedData* armd_processed_data)
 {
 	//файл не изменился и последней записью УЧПУ было событие отличное от события "нет события"
 	//факт того, что длина файла не изменяется не может служить признаком того, что УЧПУ перестало посылать данные,
 	//т.к. событие "нет события" обновляется не изменяя длину файла
 	if (_tcsicmp(current_file_name, cnc_last_entry) != 0 &&
-		armd_parser_data->parsed_file_len >= armd_header_info->file_size) //изменился файл, с которым в настоящий моммент работает программа УЧПУ?
+		armd_file_reader_data->parsed_file_len >= armd_header_info->file_size) //изменился файл, с которым в настоящий моммент работает программа УЧПУ?
 	{//устанавливаем начальные значения для считывания файла
-		_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_parser_data->index, GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
+		_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_file_reader_data->index, GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
 		_tcscpy_s(current_file_name, MAX_PATH, cnc_last_entry);
-		ResetFileReader(armd_parser_data, armd_processed_data);
+		ResetFileReader(armd_file_reader_data, armd_processed_data);
 		FreeHeader(&armd_header_info);
 	}
 	return 0;
@@ -193,13 +193,13 @@ int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDParserDa
 
 int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD* keyboard, _TCHAR* current_file_name)
 {
-	ARMDParserData armd_parser_data;
+	ARMDFileReaderData armd_file_reader_data;
 	ARMDProcessedData armd_processed_data;
 	_TCHAR cnc_last_entry[MAX_ARMD_FILE_NAME + 1];
 	int main_result = ERROR_OK;;
 	ARMDHeaderInfo* armd_header_info = NULL;
 	memset(&armd_processed_data, 0, sizeof(ARMDProcessedData));
-	memset(&armd_parser_data, 0, sizeof(ARMDParserData));
+	memset(&armd_file_reader_data, 0, sizeof(ARMDFileReaderData));
 	while (main_result >= ERROR_OK && !IsTerminated(keyboard))
 	{
 		BOOL waked = ReadDelay(program_parameters->delay_time_ms);
@@ -209,9 +209,9 @@ int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD*
 		{
 			if (armd_header_info)
 			{
-				if (IsARMDFileEnded(armd_header_info, &armd_parser_data) >= 0)
+				if (IsARMDFileEnded(armd_header_info, &armd_file_reader_data) >= 0)
 				{
-					_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_parser_data.index,
+					_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_file_reader_data.index,
 						GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
 					FreeHeader(&armd_header_info);
 					int key = WaitKeyPressed(keyboard);
@@ -228,42 +228,42 @@ int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD*
 				continue;
 			if (armd_header_info)
 			{
-				if (NextFileMode(current_file_name, cnc_last_entry, &armd_parser_data, armd_header_info, &armd_processed_data) < 0)
+				if (NextFileMode(current_file_name, cnc_last_entry, &armd_file_reader_data, armd_header_info, &armd_processed_data) < 0)
 					break;
 			}
 			else
 				_tcscpy_s(current_file_name, MAX_PATH, cnc_last_entry);
 		}
 		DWORD store_index = armd_processed_data.number_items;
-		int read_armd_file_status = ReadARMDFile(MAX_PATH, current_file_name, &armd_parser_data);
+		int read_armd_file_status = ReadARMDFile(MAX_PATH, current_file_name, &armd_file_reader_data);
 		if (read_armd_file_status == ERROR_OK)
 		{
-			int parce_block_result = ARMDParseBlock(console_output, keyboard, &armd_header_info, &armd_processed_data, &armd_parser_data);
-			if (parce_block_result >= ERROR_OK)
+			int parse_block_result = ARMDParseBlock(console_output, keyboard, &armd_header_info, &armd_processed_data, &armd_file_reader_data);
+			if (parse_block_result >= ERROR_OK)
 				ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
 			else
-				main_result = parce_block_result;
+				main_result = parse_block_result;
 		}
 		for (DWORD i_number = store_index; i_number < armd_processed_data.number_items; i_number++)
-			FreeProcData(*(armd_processed_data.data + i_number));
+			FreeARMDMessage(*(armd_processed_data.data + i_number));
 
 	}
 	if (armd_header_info)
 		FreeHeader(&armd_header_info);
 	FreeProcessedData(&armd_processed_data);
-	FreeARMDParseData(&armd_parser_data);
+	FreeARMDParseData(&armd_file_reader_data);
 	return main_result;
 }
 
-void FreeARMDParseData(ARMDParserData* armd_parser_data)
+void FreeARMDParseData(ARMDFileReaderData* armd_file_reader_data)
 {
-	if (armd_parser_data)
+	if (armd_file_reader_data)
 	{
-		armd_parser_data->parsed_file_len = 0;
-		armd_parser_data->index = 0;
-		if (armd_parser_data->buf)
-			free(armd_parser_data->buf);
-		armd_parser_data->max_buf = 0;
+		armd_file_reader_data->parsed_file_len = 0;
+		armd_file_reader_data->index = 0;
+		if (armd_file_reader_data->buf)
+			free(armd_file_reader_data->buf);
+		armd_file_reader_data->max_buf = 0;
 	}
 }
 

@@ -2,7 +2,7 @@
 #define MISC_H
 
 #include "ARMDParser.h"
-int ParceString(char** const str_out, ARMDParserData* armd_parser_data);
+int parseString(char** const str_out, ARMDFileReaderData* armd_file_reader_data);
 
 #endif
 

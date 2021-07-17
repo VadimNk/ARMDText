@@ -5,7 +5,8 @@
 
 #include <windows.h>
 #include "ARMD.h"
-#include "ARMDParserData.h"
+#include "ARMDFileReaderData.h"
+//#include "ARMDFileReader.h"
 
 #define IDENTIFIER_LEN			4			//длина заголовка
 #define VERSION_LEN				4			//длина поля, в котором находится значение "версия структур файлов мониторинга"
@@ -66,7 +67,7 @@ typedef struct _armd_header_info {
     ProcInfo* proc_info;						//параметры АРМД для каждого из процессов, заданных в файле конфигурации АРМД
 }ARMDHeaderInfo;
 
-int LoadHeader(ARMDHeaderInfo** const armd_header_info_p, ARMDParserData* armd_parser_data);
+int LoadHeader(ARMDHeaderInfo** const armd_header_info_p, ARMDFileReaderData* armd_file_reader_data);
 void FreeHeader(ARMDHeaderInfo** armd_header_info);
 
 #endif// !_ARMD_HEADER_PARSER_H_

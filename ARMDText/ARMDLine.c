@@ -11,18 +11,18 @@ void FreeARMDLine(ARMDLine armd_string)
 	free(armd_string);
 }
 
-int GetARMDLine(ARMDLine* armd_string_out, ARMDParserData* armd_parser_data)
+int GetARMDLine(ARMDLine* armd_string_out, ARMDFileReaderData* armd_file_reader_data)
 {
 	int status = ERROR_COMMON;
 	ARMDLine armd_string;
 	armd_string = (ARMDLine)calloc(1, sizeof(ARMDLineData));
 	if (armd_string)
 	{
-		GetValFromBuf(&armd_string->len, armd_parser_data, sizeof(BYTE));
+		GetValFromBuf(&armd_string->len, armd_file_reader_data, sizeof(BYTE));
 		armd_string->str = (char*)calloc((size_t)armd_string->len + 1, sizeof(char));
 		if (armd_string->str)
 		{
-			GetValFromBuf(armd_string->str, armd_parser_data, armd_string->len);
+			GetValFromBuf(armd_string->str, armd_file_reader_data, armd_string->len);
 			*(armd_string->str + armd_string->len) = '\0';
 			status = ERROR_OK;
 		}

@@ -2,8 +2,8 @@
 #define _ARMD_TEXT_H_
 
 #define WIN32_LEAN_AND_MEAN
-#include "ARMDParserData.h"
+#include "ARMDFileReaderData.h"
 #include <windows.h>
 BOOL isVerobose();
-void FreeARMDParseData(ARMDParserData* armd_parser_data);
+void FreeARMDParseData(ARMDFileReaderData* armd_file_reader_data);
 #endif
