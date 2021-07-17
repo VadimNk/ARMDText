@@ -1,6 +1,10 @@
-#ifndef _ARMD_SREINGS_DISPLAY_H_
+#ifndef _ARMD_STRINGS_DISPLAY_H_
+#define _ARMD_STRINGS_DISPLAY_H_
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
-#include <Windows.h>
+#include <windows.h>
 
 #define ENGLISH_LANGUAGE 1
 #define RUSSIAN_LANGUAGE 2
@@ -94,6 +98,7 @@ typedef enum armd_strings_e {
     I_FILE_SIZE_HAVE_READ_FROM_HEADER,
     I_INITIAL_VALUES,
     I_HEADER_LOADER,
+    I_HEADER_NOT_LOADED,
     I_DATA_CHECK_ERROR,
     I_DATA_IS_CORRUPTED,
     I_FAIL_TO_READ_ARMD_FILE,

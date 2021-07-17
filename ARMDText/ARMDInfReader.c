@@ -1,3 +1,5 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
 #include <stdio.h>
 #include <windows.h>
@@ -25,7 +27,7 @@ BOOL ReadInfFile(DWORD cnc_last_entry_max_characters, _TCHAR* cnc_last_entry)
             CloseHandle(current_inf_handle);
             if (read_file_result && MAX_ARMD_FILE_NAME == last_entry_bytes_have_read)
             {
-                s_cnc_last_entry[MAX_ARMD_FILE_NAME] = '\0';
+                *(s_cnc_last_entry + MAX_ARMD_FILE_NAME) = '\0';
 #ifdef UNICODE
                 int mbwc_result = MultiByteToWideChar(CP_ACP, 0, s_cnc_last_entry, MAX_ARMD_FILE_NAME + 1, cnc_last_entry, cnc_last_entry_max_characters);
                 if (mbwc_result == MAX_ARMD_FILE_NAME + 1)

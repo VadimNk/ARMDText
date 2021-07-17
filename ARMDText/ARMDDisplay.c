@@ -1,6 +1,8 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
-#include <stdio.h>
 #include <windows.h>
+#include <stdio.h>
 #include "ARMDDisplay.h"
 #include "ARMDParser.h"
 #include "ARMDDisplayStrings.h"
@@ -51,10 +53,10 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
         }
         if (armd_data->proc_data[i_proc].proc != 0)
             _tprintf(_T("%s:%u "), GetARMDString(I_PROCESS), armd_data->proc_data[i_proc].proc);
-        for (short event = 0; event < armd_data->proc_data[i_proc].num_event; event++)
+        for (short i_event = 0; i_event < armd_data->proc_data[i_proc].num_event; i_event++)
         {
-            ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[event];
-            switch (event_data->event)
+            ARMDEventData* event_data = &armd_data->proc_data[i_proc].event_data[i_event];
+            switch (event_data->event_id)
             {
             case EVENT_NO_EVENT:
                 _tprintf(GetARMDString(I_NO_EVENT));
@@ -102,22 +104,25 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
             case EVENT_SYSTEM_STATE:
                 _tprintf(_T("%s:%s| "), GetARMDString(I_SYSTEM_STATE), SYSTEM_STATE_ST[event_data->value.Char]);
                 break;
-            case EVENT_MES_ERR_PROG:
-                _tprintf(_T("%s: %d "), GetARMDString(I_PROGRAM_ERROR_MESSAGE), event_data->value.emergency_error->error_code);
-                if (event_data->value.emergency_error->msg_len != 0)
-                    _tprintf(_T(" %s: %s| "), GetARMDString(I_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.emergency_error->msg));
+            case EVENT_EMERGENCY_ERROR_MESSAGE:
+                if (event_data->value.emergency_error)
+                {
+                    _tprintf(_T("%s: %d "), GetARMDString(I_PROGRAM_ERROR_MESSAGE), event_data->value.emergency_error->error_code);
+                    if (event_data->value.emergency_error->msg_len != 0)
+                        _tprintf(_T(" %s: %s| "), GetARMDString(I_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.emergency_error->msg));
+                }
                 break;
             case EVENT_PROGRAM_NAME:
-                for (int i = 0; i < event_data->value.progname->num; i++)
+                for (int i = 0; i < event_data->value.prog_name->num; i++)
                 {
-                    switch (event_data->value.progname->data[i].layer)
+                    switch (event_data->value.prog_name->data[i].layer)
                     {
                     case ROUTINE: _tprintf(_T("%s "), GetARMDString(I_ROUTINE)); break;
                     case SUBROUTINE1: _tprintf(_T("%s 1 "), GetARMDString(I_SUBROUTINE)); break;
                     case SUBROUTINE2: _tprintf(_T("%s 2 "), GetARMDString(I_SUBROUTINE)); break;
                     }
-                    _tprintf(_T("%s:%s| "), GetARMDString(I_NAME), ByteToWide(MAX_TMP, tmp, event_data->value.progname->data[i].name));
-                    _tprintf(_T("%s:%s| "), GetARMDString(I_PATH), ByteToWide(MAX_TMP, tmp, event_data->value.progname->data[i].path));
+                    _tprintf(_T("%s:%s| "), GetARMDString(I_NAME), ByteToWide(MAX_TMP, tmp, event_data->value.prog_name->data[i].name));
+                    _tprintf(_T("%s:%s| "), GetARMDString(I_PATH), ByteToWide(MAX_TMP, tmp, event_data->value.prog_name->data[i].path));
                 }
                 break;
             case EVENT_CONTROL_PANEL_SWITCH_JOG:
@@ -173,10 +178,10 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
                 }
                 break;
             case EVENT_ALARM_PLC_ERR:
-                _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_ALARM), ByteToWide(MAX_TMP, tmp, event_data->value.alarm_plc_error->log));
+                _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_ALARM), ByteToWide(MAX_TMP, tmp, event_data->value.alarm_plc_error->str));
                 break;
             case EVENT_MESS_PLC_ERR:
-                _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.mess_plc_error->log));
+                _tprintf(_T("%s:%s| "), GetARMDString(I_PLC_MESSAGE), ByteToWide(MAX_TMP, tmp, event_data->value.mess_plc_error->str));
                 break;
             case EVENT_PROCESS_COMMAND_LINE:
                 _tprintf(_T("%s:%s| "), GetARMDString(I_COMMNAD_FROM_PROCESS), ByteToWide(MAX_TMP, tmp, event_data->value.command_line->str));
@@ -194,9 +199,9 @@ int ShowVal(HANDLE console_output, ARMDMessageData* armd_data)
             case EVENT_G_FUNCTIONS:
 #define NO_G 0xFF
                 _tprintf(_T("%s: "), GetARMDString(I_G_FUNCTIONS));
-                for (int i = 0; i < event_data->value.g_functions->num; i++)
-                    if (event_data->value.g_functions->g[i] != NO_G)
-                        _tprintf(_T("%u "), event_data->value.g_functions->g[i]);
+                for (int i = 0; i < event_data->value.g_functions->len; i++)
+                    if (*(event_data->value.g_functions->str + i) != NO_G)
+                        _tprintf(_T("%u "), *(BYTE*)(event_data->value.g_functions->str + i));
                     else
                         _tprintf(_T("  "));
                 _tprintf(_T("| "));

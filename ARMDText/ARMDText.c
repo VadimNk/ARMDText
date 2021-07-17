@@ -36,6 +36,8 @@
 #define DBG_NEW new
 #endif
 
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
 #include <windows.h>
 #include <locale.h>
@@ -55,7 +57,7 @@
 #include "ARMDFileReader.h"
 #include "ARMDMessageParser.h"
 #include "Keyboard.h"
-#include "ProgrammParameters.h"
+#include "ProgramParameters.h"
 #include "ARMDDisplayStrings.h"
 #include "ARMDHeaderDisplay.h"
 
@@ -93,9 +95,9 @@ BOOL ReadDelay(clock_t delay)
 	return waked;
 }
 
-void ExitMain(_TCHAR* current_file_name, ProgrammParameters* programm_parameters)
+void ExitMain(_TCHAR* current_file_name, ProgramParameters* program_parameters)
 {
-	FreeParseProgramParameters(programm_parameters);
+	FreeParseProgramParameters(program_parameters);
 	if (current_file_name)
 		free(current_file_name);
 }
@@ -103,7 +105,6 @@ void ExitMain(_TCHAR* current_file_name, ProgrammParameters* programm_parameters
 
 BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType)
 {
-	INPUT ip;
 	if (dwCtrlType == CTRL_CLOSE_EVENT)
 	{
 		while (1)
@@ -132,20 +133,23 @@ void ViewBlock(HANDLE console_output, KEYBOARD* keyboard, DWORD store_index, ARM
 	}
 }
 
-void ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDParserData* armd_parser_data)
+int ARMDParseBlock(ARMDProcessedData* armd_processed_data, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDFileReaderData* armd_file_reader_data)
 {
 	int result = ERROR_OK;
 	BOOL no_event_state = FALSE;
 	int parse_armd_buffer_result = ERROR_COMMON;
-	armd_parser_data->index = 0;
+	armd_file_reader_data->index = 0;
 	if (!*armd_header_info) //заголовок ещё не считывался?
 	{//считываем заголовок
-		LoadHeader(armd_header_info, armd_parser_data);
-		_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_LOADER));
+		int result = LoadHeader(armd_header_info, armd_file_reader_data);
+		if(result >= ERROR_OK)
+			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_LOADER));
+		else
+			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_NOT_LOADED));
 	}
-	while (armd_parser_data->index < armd_parser_data->max_buf && !IsTerminated(keyboard))
+	while (result >= ERROR_OK && armd_file_reader_data->index < armd_file_reader_data->max_buf && !IsTerminated(keyboard))
 	{
-		parse_armd_buffer_result = GetARMDMessage(console_output, armd_header_info, armd_processed_data, armd_parser_data, &no_event_state);
+		parse_armd_buffer_result = ParseARMDMessageToProcessedData(armd_processed_data, armd_header_info, armd_file_reader_data, &no_event_state);
 		if (parse_armd_buffer_result < 0)
 		{
 			result = parse_armd_buffer_result;
@@ -154,74 +158,66 @@ void ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** 
 	}
 	if (parse_armd_buffer_result >= 0)
 	{
-		armd_parser_data->parsed_file_len += armd_parser_data->index;//прибавляем к прочитанному объему данных из файла длину буфера
+		armd_file_reader_data->parsed_file_len += armd_file_reader_data->index;//прибавляем к прочитанному объему данных из файла длину буфера
 		//т.к. событие "нет события" затирается следующим событием причем это может быть повторное событие "нет события" 
 		//с новым временем появления, которое возникает в системе, если не происходило никаких изменений в значениях мониторируемых переменных, 
 		//то необходимо вернуться на позицию в файле до события "нет события". Период возникновения события "нет события"
 		//(запись на диск накопленного буффера) устанавливается инструкцией RecordTime в файле MonCfg.ini.
-
-		//if (no_event_state > 0)//Было событие "нет события" последним в буфере?
-		//{//переместить "указатель" в файле в позицию до события "нет события"
-//            armd_parser_data->parsed_file_len -= NO_EVENT_EVENT_LEN;
-  //      }
 	}
+	return result;
 }
 
-int SetNextFileSpecifiedFileMode(ARMDHeaderInfo* armd_header_info, ARMDParserData* armd_parser_data)
+int IsARMDFileEnded(ARMDHeaderInfo* armd_header_info, ARMDFileReaderData* armd_file_reader_data)
 {
-	if (armd_parser_data->parsed_file_len >= armd_header_info->file_size)
-	{//дочитали файл до конца на момент последней записи УЧПУ
-		_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_parser_data->index,
-			GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
-		FreeHeader(&armd_header_info);
-		return -1;
-	}
-	return 0;
+	return armd_file_reader_data->parsed_file_len >= armd_header_info->file_size ? ERROR_OK : ERROR_COMMON;
 }
 
-int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDParserData* armd_parser_data, ARMDHeaderInfo* armd_header_info,
+int NextFileMode(_TCHAR* current_file_name, _TCHAR* cnc_last_entry, ARMDFileReaderData* armd_file_reader_data, ARMDHeaderInfo* armd_header_info,
 	ARMDProcessedData* armd_processed_data)
 {
 	//файл не изменился и последней записью УЧПУ было событие отличное от события "нет события"
 	//факт того, что длина файла не изменяется не может служить признаком того, что УЧПУ перестало посылать данные,
 	//т.к. событие "нет события" обновляется не изменяя длину файла
 	if (_tcsicmp(current_file_name, cnc_last_entry) != 0 &&
-		armd_parser_data->parsed_file_len >= armd_header_info->file_size) //изменился файл, с которым в настоящий моммент работает программа УЧПУ?
+		armd_file_reader_data->parsed_file_len >= armd_header_info->file_size) //изменился файл, с которым в настоящий моммент работает программа УЧПУ?
 	{//устанавливаем начальные значения для считывания файла
-		_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_parser_data->index, GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
+		_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_file_reader_data->index, GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
 		_tcscpy_s(current_file_name, MAX_PATH, cnc_last_entry);
-		ResetFileReader(armd_parser_data, armd_processed_data);
+		ResetFileReader(armd_file_reader_data, armd_processed_data);
 		FreeHeader(&armd_header_info);
 	}
 	return 0;
 }
 
-int View(HANDLE console_output, ProgrammParameters* programm_parameters, KEYBOARD* keyboard, _TCHAR* current_file_name)
+int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD* keyboard, _TCHAR* current_file_name)
 {
-	ARMDParserData armd_parser_data;
+	ARMDFileReaderData armd_file_reader_data;
 	ARMDProcessedData armd_processed_data;
 	_TCHAR cnc_last_entry[MAX_ARMD_FILE_NAME + 1];
 	int main_result = ERROR_OK;;
 	ARMDHeaderInfo* armd_header_info = NULL;
 	memset(&armd_processed_data, 0, sizeof(ARMDProcessedData));
-	memset(&armd_parser_data, 0, sizeof(ARMDParserData));
+	memset(&armd_file_reader_data, 0, sizeof(ARMDFileReaderData));
 	while (main_result >= ERROR_OK && !IsTerminated(keyboard))
 	{
-		BOOL waked = ReadDelay(programm_parameters->delay_time_ms);
+		BOOL waked = ReadDelay(program_parameters->delay_time_ms);
 		if (waked)
 			continue;
-		if (programm_parameters->specified_armd_file)
+		if (program_parameters->specified_armd_file)
 		{
 			if (armd_header_info)
 			{
-				if (SetNextFileSpecifiedFileMode(armd_header_info, &armd_parser_data) < 0)
+				if (IsARMDFileEnded(armd_header_info, &armd_file_reader_data) >= 0)
 				{
+					_tprintf(_T("%s:%u, %s:%u"), GetARMDString(I_INDEX), armd_file_reader_data.index,
+						GetARMDString(I_FILE_SIZE_HAVE_READ_FROM_HEADER), armd_header_info->file_size);
+					FreeHeader(&armd_header_info);
 					int key = WaitKeyPressed(keyboard);
 					break;
 				}
 			}
 			else
-				_tcscpy_s(current_file_name, MAX_PATH, programm_parameters->specified_armd_file);
+				_tcscpy_s(current_file_name, MAX_PATH, program_parameters->specified_armd_file);
 		}
 		else
 		{
@@ -230,28 +226,43 @@ int View(HANDLE console_output, ProgrammParameters* programm_parameters, KEYBOAR
 				continue;
 			if (armd_header_info)
 			{
-				if (NextFileMode(current_file_name, cnc_last_entry, &armd_parser_data, armd_header_info, &armd_processed_data) < 0)
+				if (NextFileMode(current_file_name, cnc_last_entry, &armd_file_reader_data, armd_header_info, &armd_processed_data) < 0)
 					break;
 			}
 			else
 				_tcscpy_s(current_file_name, MAX_PATH, cnc_last_entry);
 		}
 		DWORD store_index = armd_processed_data.number_items;
-		int read_armd_file_status = ReadARMDFile(MAX_PATH, current_file_name, &armd_parser_data);
+		int read_armd_file_status = ReadARMDFile(MAX_PATH, current_file_name, &armd_file_reader_data);
 		if (read_armd_file_status == ERROR_OK)
 		{
-			ARMDParseBlock(console_output, keyboard, &armd_header_info, &armd_processed_data, &armd_parser_data);
-			ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
+			int parse_block_result = ARMDParseBlock(&armd_processed_data, keyboard, &armd_header_info, &armd_file_reader_data);
+			if (parse_block_result >= ERROR_OK)
+				ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
+			else
+				main_result = parse_block_result;
 		}
 		for (DWORD i_number = store_index; i_number < armd_processed_data.number_items; i_number++)
-			FreeEventData(*(armd_processed_data.data + i_number));
+			FreeARMDMessage(*(armd_processed_data.data + i_number));
 
 	}
 	if (armd_header_info)
 		FreeHeader(&armd_header_info);
 	FreeProcessedData(&armd_processed_data);
-	FreeARMDParseData(&armd_parser_data);
+	FreeARMDParseData(&armd_file_reader_data);
 	return main_result;
+}
+
+void FreeARMDParseData(ARMDFileReaderData* armd_file_reader_data)
+{
+	if (armd_file_reader_data)
+	{
+		armd_file_reader_data->parsed_file_len = 0;
+		armd_file_reader_data->index = 0;
+		if (armd_file_reader_data->buf)
+			free(armd_file_reader_data->buf);
+		armd_file_reader_data->max_buf = 0;
+	}
 }
 
 void SetDefaultLanguage()
@@ -267,7 +278,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	int main_result = ERROR_OK;
 	KEYBOARD keyboard;
-	ProgrammParameters programm_parameters;
+	ProgramParameters program_parameters;
 	HANDLE console_output;
 	_TCHAR* current_file_name;
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -296,7 +307,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	SetDefaultLanguage();
 	if (set_mode_stdout_result >= 0 && set_mode_stdin_result >= 0 && set_mode_stderr_result >= 0 && set_console_output_result && set_console)
 	{
-		SetDefaultProgramParameters(&programm_parameters);
+		SetDefaultProgramParameters(&program_parameters);
 
 		console_output = GetStdHandle(STD_OUTPUT_HANDLE);// Получаем хэндл консоли //с помощью него будем менять цвет строк
 		if (console_output != INVALID_HANDLE_VALUE && console_output)
@@ -306,14 +317,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			current_file_name = (_TCHAR*)malloc(MAX_PATH * sizeof(_TCHAR));
 			if (current_file_name)
 			{
-				programm_parameters = ParseProgramParameters(argc, argv);
-				if (programm_parameters.status >= ERROR_OK)
+				program_parameters = ParseProgramParameters(argc, argv);
+				if (program_parameters.status >= ERROR_OK)
 				{
-					View(console_output, &programm_parameters, &keyboard, current_file_name);
+					main_result = View(console_output, &program_parameters, &keyboard, current_file_name);
 				}
 			}
 			SetConsoleTextAttribute(console_output, FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN);
-			ExitMain(current_file_name, &programm_parameters);
+			ExitMain(current_file_name, &program_parameters);
 			ReleaseKeyboard(&keyboard);
 		}
 		else

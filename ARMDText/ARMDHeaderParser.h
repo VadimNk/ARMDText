@@ -1,8 +1,12 @@
 #ifndef _ARMD_HEADER_PARSER_H_
 #define _ARMD_HEADER_PARSER_H_
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include "ARMD.h"
-#include "ARMDParserData.h"
+#include "ARMDFileReaderData.h"
+//#include "ARMDFileReader.h"
 
 #define IDENTIFIER_LEN			4			//длина заголовка
 #define VERSION_LEN				4			//длина поля, в котором находится значение "версия структур файлов мониторинга"
@@ -17,7 +21,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------//
 
 typedef struct _sys_armd_info {
-    short			event;			//событие
+    short			event_id;			//событие
     int				account_type;	//тип(вид) учета: как отслеживать события (находятся параметры событий, такие как TIMER_EVENT_VAR TICKCPU_EVENT_VAR)
     float			account_param;	//параметр типа учета (к примеру через сколько миллисекунд необходимо выполнять контроль для TIMER_EVENT_VAR)
                                     //к примеру если в файле конфигурации установлен мониторинг среднего значения подачи за 1с=1000 миллисекунд
@@ -63,7 +67,7 @@ typedef struct _armd_header_info {
     ProcInfo* proc_info;						//параметры АРМД для каждого из процессов, заданных в файле конфигурации АРМД
 }ARMDHeaderInfo;
 
-int LoadHeader(ARMDHeaderInfo** const armd_header_info_p, ARMDParserData* armd_parser_data);
+int LoadHeader(ARMDHeaderInfo** const armd_header_info_p, ARMDFileReaderData* armd_file_reader_data);
 void FreeHeader(ARMDHeaderInfo** armd_header_info);
 
 #endif// !_ARMD_HEADER_PARSER_H_

@@ -1,14 +1,18 @@
 #ifndef _ARMD_PARSER_H
 #define _ARMD_PARSER_H
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
-#include "ARMDParserData.h"
+#include "ARMDFileReaderData.h"
 #include "ARMDHeaderParser.h"
 #include "ARMDMessageParser.h"
-#include "ARMDProcessData.h"
+#include "ARMDProcessedData.h"
 #include "ARMDDisplay.h"
 #include "ARMDError.h"
 
 //----соотношение номеров событий и мнемонических названий--------------------------------------//
+#define EVENT_ERROR_EVENT					0
 #define EVENT_NO_EVENT						1
 #define EVENT_SYSTEM_START					2
 #define EVENT_NEW_DATE						3
@@ -16,7 +20,7 @@
 #define EVENT_FEED							5
 #define EVENT_SPINDLE_SPEED					6
 #define EVENT_SYSTEM_STATE					7	//EVENT_SYSTEM_STATE == EVENT_PROGRAM_STATE
-#define EVENT_MES_ERR_PROG					8
+#define EVENT_EMERGENCY_ERROR_MESSAGE		8
 #define EVENT_PROGRAM_NAME					9
 #define EVENT_CONTROL_PANEL_SWITCH_JOG		10
 #define EVENT_CONTROL_PANEL_SWITCH_FEED		11
@@ -62,8 +66,8 @@
 #define SUBROUTINE2	2					//имя подпрограммы 2 уровня вложенности
 //---------------------------------------------------------------------------------------------------------------------------------------------//
 
-void GetValFromBuf(void* value, ARMDParserData* armd_parser_data, const DWORD value_size);
-int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data,
-    ARMDParserData* armd_parser_data, BOOL* no_event_state);
+int GetValFromBuf(void* value, ARMDFileReaderData* armd_file_reader_data, const DWORD value_size);
+int ParseARMDMessageToProcessedData(ARMDProcessedData* armd_processed_data, ARMDHeaderInfo** armd_header_info,
+    ARMDFileReaderData* armd_file_reader_data, BOOL* no_event_state);
 
 #endif // !_ARMD_PARSER_H

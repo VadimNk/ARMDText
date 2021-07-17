@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\MessageEvents">
+      <UniqueIdentifier>{b7171c82-d4e7-455c-ae60-7418d6e6b495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MessageEvents">
+      <UniqueIdentifier>{1b69eaa4-e4ce-4841-8f15-63de3406b5e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ARMDText.c">
@@ -42,22 +48,46 @@
     <ClCompile Include="ARMDParser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ARMDParserData.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ARMDProcessedData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Keyboard.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProgrammParameters.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StringsEn.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StringsRu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgramParameters.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventProgramName.c">
+      <Filter>Source Files\MessageEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="EventSystemStart.c">
+      <Filter>Source Files\MessageEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDate.c">
+      <Filter>Source Files\MessageEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="EventEmergencyErrorMessage.c">
+      <Filter>Source Files\MessageEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="EventMachineIdletimeCause.c">
+      <Filter>Source Files\MessageEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="ARMDLine.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ARMDEventParser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ARMDProcessEventsParser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,22 +128,49 @@
     <ClInclude Include="ARMDParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ARMDParserData.h">
+    <ClInclude Include="ARMDFileReaderData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ARMDProcessData.h">
+    <ClInclude Include="ARMDProcessedData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Keyboard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProgrammParameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StringsEn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StringsRu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgramParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventProgramName.h">
+      <Filter>Header Files\MessageEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystemStart.h">
+      <Filter>Header Files\MessageEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDate.h">
+      <Filter>Header Files\MessageEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="EventEmergencyErrorMessage.h">
+      <Filter>Header Files\MessageEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="EventMachineIdletimeCause.h">
+      <Filter>Header Files\MessageEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="ARMDLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ARMDEventParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ARMDProcessEventsParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

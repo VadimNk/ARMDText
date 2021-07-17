@@ -1,12 +1,15 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include <stdio.h>
-#include "ProgrammParameters.h"
+#include <malloc.h>
+#include "ProgramParameters.h"
 #include "ARMDError.h"
 #include "ARMDDisplayStrings.h"
 
 #define SECONDS_TO_MILLISECONDS(x) x * 1000
 
-void SetDefaultProgramParameters(ProgrammParameters* program_parameters)
+void SetDefaultProgramParameters(ProgramParameters* program_parameters)
 {
 	if (program_parameters)
 	{
@@ -16,12 +19,12 @@ void SetDefaultProgramParameters(ProgrammParameters* program_parameters)
 	}
 }
 
-void FreeParseProgramParameters(ProgrammParameters* programm_parameters)
+void FreeParseProgramParameters(ProgramParameters* program_parameters)
 {
-	if (programm_parameters)
+	if (program_parameters)
 	{
-		if (programm_parameters->specified_armd_file)
-			free(programm_parameters->specified_armd_file);
+		if (program_parameters->specified_armd_file)
+			free(program_parameters->specified_armd_file);
 	}
 }
 
@@ -34,18 +37,18 @@ int ToLower(_TCHAR * tmp_str, DWORD max_str, _TCHAR* argv)
 	else
 		return -1;
 }
-//-file 201902323.mon -delay 100 -lanuage russian
-ProgrammParameters ParseProgramParameters(int argc, _TCHAR * *argv)
+// cmd example: /file 201902323.mon /delay 100 /language russian
+ProgramParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 {
 	_TCHAR tmp_str[MAX_PATH];
 
-	ProgrammParameters programm_parameters;
-	SetDefaultProgramParameters(&programm_parameters);
+	ProgramParameters program_parameters;
+	SetDefaultProgramParameters(&program_parameters);
 	for (int i = 1; i < argc; i++)
 	{
 		if( ToLower(tmp_str, MAX_PATH, *(argv + i)) == 0)
 		{
-			if (_tcscmp(tmp_str, _T("-file")) == 0)
+			if (_tcscmp(tmp_str, _T("/file")) == 0)
 			{
 				if (i + 1 < argc)
 					i++;
@@ -57,18 +60,18 @@ ProgrammParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 						size_t str_len = _tcslen(tmp_str);
 						if (str_len > 0)
 						{
-							programm_parameters.specified_armd_file = (_TCHAR*)malloc((str_len + 1) * sizeof(_TCHAR));
-							if (programm_parameters.specified_armd_file)
-								_tcscpy_s(programm_parameters.specified_armd_file, str_len + 1, tmp_str);
+							program_parameters.specified_armd_file = (_TCHAR*)malloc((str_len + 1) * sizeof(_TCHAR));
+							if (program_parameters.specified_armd_file)
+								_tcscpy_s(program_parameters.specified_armd_file, str_len + 1, tmp_str);
 							else
-								programm_parameters.status = ERROR_OUT_OF_MEMORY;
+								program_parameters.status = ERROR_MEMORY_ALLOCATION_ERROR;
 						}
 					}
 				}
 			}
 			else
 			{
-				if (_tcscmp(tmp_str, _T("-delay")) == 0)
+				if (_tcscmp(tmp_str, _T("/delay")) == 0)
 				{
 					if (i + 1 < argc)
 						i++;
@@ -77,12 +80,12 @@ ProgrammParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 						long value = _ttol(*(argv + i));
 						if (value == 0)
 							value = 1;
-						programm_parameters.delay_time_ms = SECONDS_TO_MILLISECONDS(value);
+						program_parameters.delay_time_ms = SECONDS_TO_MILLISECONDS(value);
 					}
 				}
 				else
 				{
-					if (_tcscmp(tmp_str, _T("-language")) == 0)
+					if (_tcscmp(tmp_str, _T("/language")) == 0)
 					{
 						if (i + 1 < argc)
 							i++;
@@ -96,5 +99,5 @@ ProgrammParameters ParseProgramParameters(int argc, _TCHAR * *argv)
 			}
 		}
 	}
-	return programm_parameters;
+	return program_parameters;
 }

@@ -1,5 +1,8 @@
 #ifndef _ARMD_PROCESS_DATA_H_
 #define _ARMD_PROCESS_DATA_H_
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include "ARMDMessage.h"
 // в структуре хранится уже обработанные данные

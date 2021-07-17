@@ -1,6 +1,10 @@
 #ifndef _ARMD_MESSAGE_H
 #define _ARMD_MESSAGE_H
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
+#include "ARMDLine.h"
 //----начало структуры данных событий АРМД-------------------//
 typedef struct _g_functions {
     BYTE num;
@@ -24,7 +28,7 @@ typedef struct _emerg_data {
     char error_code;
     char msg_len;
     char* msg;
-}EmergData;
+}EmergencyErrorMessage;
 
 //------MachineIdleTime--------------//
 typedef struct _idle {
@@ -73,29 +77,32 @@ typedef struct _subroutine_info {
     char* str;
 }SubroutineInfo;
 
+typedef short ARMDEventId;
+
+typedef union _armd_value {
+    char	Char;
+    short	Short;
+    int		Int;
+    float	Float;
+    long	Long;
+    WORD	Word;
+    char* str;
+    void* Void;
+    WORD* time;
+    ARMDLine g_functions;
+    ProgName* prog_name;
+    EmergencyErrorMessage* emergency_error;
+    MachineIdleTime* machine_idletime;
+    ARMDLine alarm_plc_error;
+    ARMDLine mess_plc_error;
+    SystemStartData* system_start_data;
+    ARMDLine command_line;
+    ARMDLine subroutine_info;
+}ARMDEventValue;
+
 typedef struct _armd_event_data {
-    short event;					//событие
-    union
-    {
-        char	Char;
-        short	Short;
-        int		Int;
-        float	Float;
-        long	Long;
-        WORD	Word;
-        char* str;
-        void* Void;
-        WORD* time;
-        GFunctions* g_functions;
-        ProgName* progname;
-        EmergData* emergency_error;
-        MachineIdleTime* machine_idletime;
-        PlcError* alarm_plc_error;
-        PlcError* mess_plc_error;
-        SystemStartData* system_start_data;
-        CommandLine* command_line;
-        SubroutineInfo* subroutine_info;
-    }value;							//значение события
+    ARMDEventId event_id;					//событие
+    ARMDEventValue value;
 }ARMDEventData;
 
 //----конец структуры данных событий АРМД-------------------//

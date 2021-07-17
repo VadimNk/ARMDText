@@ -1,3 +1,5 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <tchar.h>
 #include <windows.h>
 #include <stdio.h>
@@ -64,8 +66,8 @@ void DisplayHeader(HANDLE console_output, ARMDHeaderInfo* const armd_header_info
                         SetConsoleTextAttribute(console_output, j % 2 ? FOREGROUND_GREEN | FOREGROUND_INTENSITY : FOREGROUND_RED | FOREGROUND_INTENSITY);
 
                         _tprintf(_T("%s: %3d  "), GetARMDString(I_INDEX), j);
-                        _tprintf(_T("%s: %3d  "), GetARMDString(I_EVENT), armd_header_info->proc_info[i].event_info[j].event);
-                        _tprintf(_T("%35s  "), GetARMDString(armd_header_info->proc_info[i].event_info[j].event + I_RESET));
+                        _tprintf(_T("%s: %3d  "), GetARMDString(I_EVENT), armd_header_info->proc_info[i].event_info[j].event_id);
+                        _tprintf(_T("%35s  "), GetARMDString(armd_header_info->proc_info[i].event_info[j].event_id + I_RESET));
                         _tprintf(_T("%s: %3d  "), GetARMDString(I_ACCOUNT_TYPE), armd_header_info->proc_info[i].event_info[j].account_type);
                         _tprintf(_T("%s: %10.2f  "), GetARMDString(I_ACCOUNT_PARAMETER), armd_header_info->proc_info[i].event_info[j].account_param);
                         _tprintf(_T("%s: %u\n"), GetARMDString(I_UNITS), armd_header_info->proc_info[i].event_info[j].units);
