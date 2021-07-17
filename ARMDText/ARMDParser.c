@@ -6,7 +6,7 @@
 #include "ARMDParser.h"
 #include "ARMDDisplayStrings.h"
 
-int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDFileReaderData* armd_file_reader_data, BOOL* no_event_state)
+int ParseARMDMessageToProcessedData(ARMDProcessedData* armd_processed_data, ARMDHeaderInfo** armd_header_info, ARMDFileReaderData* armd_file_reader_data, BOOL* no_event_state)
 {
     int parse_armd_buffer_status = ERROR_OK;
     {//считываем сообщения

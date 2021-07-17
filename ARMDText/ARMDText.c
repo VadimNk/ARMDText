@@ -133,7 +133,7 @@ void ViewBlock(HANDLE console_output, KEYBOARD* keyboard, DWORD store_index, ARM
 	}
 }
 
-int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data, ARMDFileReaderData* armd_file_reader_data)
+int ARMDParseBlock(ARMDProcessedData* armd_processed_data, KEYBOARD* keyboard, ARMDHeaderInfo** armd_header_info, ARMDFileReaderData* armd_file_reader_data)
 {
 	int result = ERROR_OK;
 	BOOL no_event_state = FALSE;
@@ -145,13 +145,11 @@ int ARMDParseBlock(HANDLE console_output, KEYBOARD* keyboard, ARMDHeaderInfo** a
 		if(result >= ERROR_OK)
 			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_LOADER));
 		else
-		{
 			_tprintf(_T("%s.\n"), GetARMDString(I_HEADER_NOT_LOADED));
-		}
 	}
 	while (result >= ERROR_OK && armd_file_reader_data->index < armd_file_reader_data->max_buf && !IsTerminated(keyboard))
 	{
-		parse_armd_buffer_result = GetARMDMessage(console_output, armd_header_info, armd_processed_data, armd_file_reader_data, &no_event_state);
+		parse_armd_buffer_result = ParseARMDMessageToProcessedData(armd_processed_data, armd_header_info, armd_file_reader_data, &no_event_state);
 		if (parse_armd_buffer_result < 0)
 		{
 			result = parse_armd_buffer_result;
@@ -238,7 +236,7 @@ int View(HANDLE console_output, ProgramParameters* program_parameters, KEYBOARD*
 		int read_armd_file_status = ReadARMDFile(MAX_PATH, current_file_name, &armd_file_reader_data);
 		if (read_armd_file_status == ERROR_OK)
 		{
-			int parse_block_result = ARMDParseBlock(console_output, keyboard, &armd_header_info, &armd_processed_data, &armd_file_reader_data);
+			int parse_block_result = ARMDParseBlock(&armd_processed_data, keyboard, &armd_header_info, &armd_file_reader_data);
 			if (parse_block_result >= ERROR_OK)
 				ViewBlock(console_output, keyboard, store_index, armd_header_info, &armd_processed_data);
 			else

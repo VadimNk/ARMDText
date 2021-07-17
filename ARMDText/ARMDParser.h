@@ -67,7 +67,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------//
 
 int GetValFromBuf(void* value, ARMDFileReaderData* armd_file_reader_data, const DWORD value_size);
-int GetARMDMessage(HANDLE console_output, ARMDHeaderInfo** armd_header_info, ARMDProcessedData* armd_processed_data,
+int ParseARMDMessageToProcessedData(ARMDProcessedData* armd_processed_data, ARMDHeaderInfo** armd_header_info,
     ARMDFileReaderData* armd_file_reader_data, BOOL* no_event_state);
 
 #endif // !_ARMD_PARSER_H
