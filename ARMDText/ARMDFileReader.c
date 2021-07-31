@@ -64,6 +64,11 @@ int ReadARMDFile(DWORD current_file_name_max_characters, _TCHAR* current_file_na
             ReadARMDFileResult = ERROR_NOTHING_TO_PROCESS;
         }
         CloseHandle(armd_file);
+        if (ReadARMDFileResult < ERROR_OK)
+        {
+            if (armd_file_reader_data->flag & NO_EVENT_STATE)
+                armd_file_reader_data->parsed_file_len += NO_EVENT_EVENT_LEN;
+        }
     }
     else
     {
